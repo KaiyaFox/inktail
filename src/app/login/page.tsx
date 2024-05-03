@@ -1,14 +1,18 @@
 import { login, signup } from './actions'
+import { createClient } from 'app/utils/supabase/server';
 
-export default function LoginPage() {
+import LoginWithDiscordButton from '../components/LoginWithDiscordButton'
+
+const LoginPage: React.FC = async () => {
+
     return (
-        <form>
-            <label htmlFor="email">Email:</label>
-            <input id="email" name="email" type="email" required />
-            <label htmlFor="password">Password:</label>
-            <input id="password" name="password" type="password" required />
-            <button formAction={login}>Log in</button>
-            <button formAction={signup}>Sign up</button>
-        </form>
-    )
-}
+        <div>
+            <h1>Welcome to InkTail 🦊</h1>
+            <p>Commission art and management platform</p>
+            <LoginWithDiscordButton />
+        </div>
+    );
+};
+
+
+export default LoginPage;

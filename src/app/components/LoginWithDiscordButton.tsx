@@ -2,18 +2,25 @@
 
 import React from 'react';
 import { NextResponse, NextRequest } from 'next/server';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from "../utils/supabase/client";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { middleware } from '../../middleware';
 
+interface LoginWithDiscordButtonProps {
+    user?: any;
+    session?: any;
+    userMetadata?: any;
+    avatarUrl?: string;
+}
 
-const LoginWithDiscordButton: React.FC = () => {
+const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) => {
     const [user, setUser] = React.useState<null | any>(null);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [session, setSession] = React.useState<any>(null);
     const router = useRouter();
 
-    const supabase = createClientComponentClient()
+    const supabase = createClient()
     const handleLogin = async () => {
         // Sign in with Discord
         try {

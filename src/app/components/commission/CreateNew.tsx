@@ -1,7 +1,9 @@
 // Form for creating a new commission
 'use client'
 import React, { useState } from 'react';
-import { createClient } from '@/app/utils/supabase/client';
+import { createClient } from '../../utils/supabase/client';
+import FileUploader from '../Uploader/FileUploader';
+
 const client = createClient();
 
 const session = client.auth.getSession();
@@ -10,6 +12,7 @@ console.log('Session:', session);
 
 
 const CreateNewCommission = () => {
+    const [isLoading, setIsLoading] = useState(false);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [isMature, setIsMature] = useState(false);
@@ -43,6 +46,7 @@ const CreateNewCommission = () => {
 
         try {
             console.log('Creating commission...');
+            setIsLoading(true);
             const response = await fetch('/api/commissions/create', {
                 method: 'POST',
                 headers: {
@@ -53,11 +57,16 @@ const CreateNewCommission = () => {
 
             if (response.ok) {
                 console.log('Commission created successfully!', formData);
+                setTitle('');
+                setDescription('');
+                setIsMature(false);
             } else {
                 console.error('Failed to create commission');
             }
         } catch (error) {
             console.error('Error creating commission:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -74,6 +83,7 @@ const CreateNewCommission = () => {
             <div>
                 <label htmlFor="reference_media">Ref Sheet:</label>
                 <input type="file" id="reference_media" />
+                <FileUploader />
 
             </div>
             <div>
@@ -92,6 +102,7 @@ const CreateNewCommission = () => {
                 </select>
             </div>
             <button type="submit">Submit</button>
+            {isLoading && <p>Loading...</p>}
         </form>
     );
 };

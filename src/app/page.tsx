@@ -1,7 +1,11 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { NextRouter } from 'next/router';
 import CreateNewCommission from './components/commission/CreateNew';
+import OnboardingPage from './components/OnboardingPage';
+import {Box, Button} from "@radix-ui/themes";
+import LargeSearchBar from "./components/Search/LargeSearchBar";
 
 const HomePage: React.FC = () => {
   const router = useRouter();
@@ -11,12 +15,14 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Welcome to InkTail 🦊</h1>
-      <p>Commission based art platform</p>
-      <button onClick={handleClick}>Login</button>
-      <CreateNewCommission />
-    </div>
+      <>
+
+          <Box>
+              <LargeSearchBar/>
+          </Box>
+
+      </>
+
   );
 };
 

@@ -12,7 +12,7 @@ const SUPABASE_PROJECT_ID = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID;
 const supabase = createClient();
 
 const FileUploader: React.FC = () => {
-    const uppy = useRef(null);
+    const uppy = useRef<Uppy | null>(null);
 
     const bucket = 'commission_refs';
     const supabaseStorageURL = 'https://evhegzzxnckoxwwtkjhz.supabase.co/storage/v1/upload/resumable';
@@ -22,9 +22,7 @@ const FileUploader: React.FC = () => {
         const session = supabase.auth.getSession();
         supabase.auth.getSession().then(session => {
             console.log('Session:', session);
-            const accessToken = session.data.session.access_token;
-            // rest of your code that depends on `session`
-
+            const accessToken = session?.data?.session?.access_token;
 
 
             uppy.current = new Uppy({
@@ -35,7 +33,7 @@ const FileUploader: React.FC = () => {
 
             uppy.current.use(Dashboard, { inline: true, target: '#dashboard' });
             uppy.current.use(GoldenRetriever);
-
+            // Add the Tus plugin to enable resumable uploads
             uppy.current.use(Tus, {
                 endpoint: supabaseStorageURL,
                 headers: {
@@ -50,14 +48,11 @@ const FileUploader: React.FC = () => {
                     "cacheControl",
                 ],
 
-                onError: (error) => {
-                    console.error('Error:', error);
-                }
-
 
 
 
             });
+            // Add metadata to each file
             uppy.current.on('file-added', (file) => {
                 const supabaseMetadata = {
                     bucketName: bucket,
@@ -74,8 +69,7 @@ const FileUploader: React.FC = () => {
         }).catch(error => {
             console.error('Error:', error);
         });
-        console.log(bucket)
-
+        console.log(bucket);
 
 
         return () => {
@@ -89,10 +83,10 @@ const FileUploader: React.FC = () => {
 
     return (
         <div>
-            {/* Your component JSX goes here */}
             <div id="dashboard"></div>
         </div>
     );
+
 };
 
 export default FileUploader;

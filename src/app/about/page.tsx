@@ -1,6 +1,8 @@
+"use client";
 import React from 'react';
-
 const AboutPage: React.FC = () => {
+
+    console.log('About Page');
     return (
         <div>
             <h1>About Page</h1>

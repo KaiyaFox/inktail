@@ -6,6 +6,7 @@ import { createClient } from "../utils/supabase/client";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { middleware } from '../../middleware';
+import {Button, Avatar, Flex, Skeleton} from "@radix-ui/themes";
 
 interface LoginWithDiscordButtonProps {
     user?: any;
@@ -21,9 +22,12 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
     const router = useRouter();
 
     const supabase = createClient()
+
+    // Handle logging in.
     const handleLogin = async () => {
-        // Sign in with Discord
+        // Logging in with Discord
         try {
+            setLoading(true)
             console.log('Signing in with Discord...')
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'discord',
@@ -35,11 +39,34 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
             })
             if (error) {
                 console.error('Error signing in with Discord:', error.message)
+                setLoading(false)
                 return
             }
             console.log('Signed in with Discord:', data)
         } catch (error) {
+            setLoading(false)
             console.error('Some error occurred:', error)
+        }
+        // setLoading(false)
+    }
+
+    // Handle logging out.
+    const handleLogout = async () => {
+        try {
+            console.log('Logging out...')
+            const { error } = await supabase.auth.signOut()
+            // refresh the page
+            console.log('Redirecting to home page...')
+            setUser(null)
+
+            if (error) {
+                console.error('Error logging out:', error.message)
+                return
+            }
+            console.log('Logged out successfully')
+        } catch (error) {
+            console.error('Some error occurred:', error)
+            router.refresh();
         }
     }
 
@@ -59,13 +86,13 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                     setUser(user)
                     console.log('User:', user)
                 }
-                fetchUser()
+                await fetchUser()
 
                 console.log('Access token:', token);
             } else {
                 console.log('No active session');
             }
-            // Listen for changes to the auth state. 
+            // Listen for changes to the auth state to update the session.
             const { data: authListener } = supabase.auth.onAuthStateChange(
                 async (event, session) => {
                     console.log('Auth event:', event);
@@ -91,42 +118,26 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
         getSessionData()
     }, [supabase.auth])
 
-
-    const handleLogout = async () => {
-        try {
-            console.log('Logging out...')
-            const { error } = await supabase.auth.signOut()
-            // refresh the page
-            console.log('Redirecting to home page...')
-
-            if (error) {
-                console.error('Error logging out:', error.message)
-                return
-            }
-            console.log('Logged out successfully')
-        } catch (error) {
-            console.error('Some error occurred:', error)
-            router.refresh();
-        }
-    }
     return (
         <>
+            {loading && <Skeleton />}
             {user ? (
-                <><p>Welcome, {user.user_metadata.custom_claims.global_name}</p>
-                    <Image src={user.user_metadata.avatar_url}
-                        alt="Discord avatar"
-                        width={65}
-                        height={65}
-                        priority={true}
-                        placeholder='empty' />
-                    <button onClick={handleLogout}>
-
+                <>
+                    <Flex align="center" gap={"4"}>
+                        <Avatar
+                            radius={"large"}
+                            size = "4"
+                            src={user.user_metadata.avatar_url}
+                            fallback={user.user_metadata.custom_claims.global_name.charAt(0)}
+                        />
+                    </Flex>
+                    <Button size={"1"} onClick={handleLogout}>
                         Logout
-                    </button></>
+                    </Button></>
             ) : (
-                <button onClick={handleLogin}>
-                    Login with Discord
-                </button>
+                <Button color="red" onClick={handleLogin}>
+                    Login
+                </Button>
             )}
         </>
     );

@@ -1,6 +1,8 @@
 // Form for creating a new commission
 'use client'
 import React, { useState } from 'react';
+import {Flex, Text, Button, TextArea, Checkbox, TextField} from '@radix-ui/themes';
+
 import { createClient } from '../../utils/supabase/client';
 import FileUploader from '../Uploader/FileUploader';
 
@@ -9,7 +11,6 @@ const client = createClient();
 const session = client.auth.getSession();
 
 console.log('Session:', session);
-
 
 const CreateNewCommission = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -74,16 +75,17 @@ const CreateNewCommission = () => {
         <form onSubmit={handleSubmit}>
             <div>
                 <label htmlFor="title">Title:</label>
-                <input type="text" id="title" value={title} onChange={handleTitleChange} />
+                <TextField.Root placeholder="Name your comission piece..." type="text" id="title" value={title} onChange={handleTitleChange} />
             </div>
             <div>
                 <label htmlFor="description">Description:</label>
-                <textarea id="description" value={description} onChange={handleDescriptionChange} />
+                <TextArea placeholder="Describe high level details about your comission piece that you want the artist to know about..." id="description" value={description} onChange={handleDescriptionChange} />
             </div>
             <div>
                 <label htmlFor="reference_media">Ref Sheet:</label>
                 <input type="file" id="reference_media" />
                 <FileUploader />
+
 
             </div>
             <div>
@@ -101,7 +103,7 @@ const CreateNewCommission = () => {
                     <option value='text'>Story/Script</option>
                 </select>
             </div>
-            <button type="submit">Submit</button>
+            <Button type="submit">Submit</Button>
             {isLoading && <p>Loading...</p>}
         </form>
     );

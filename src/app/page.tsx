@@ -16,7 +16,6 @@ const HomePage: React.FC = () => {
 
   return (
       <>
-
           <Box>
               <LargeSearchBar/>
           </Box>

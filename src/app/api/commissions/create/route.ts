@@ -2,42 +2,13 @@
 
 import { NextResponse, NextRequest } from "next/server";
 import { NextApiRequest, NextApiResponse } from "next";
-import { createClient } from "@/app/utils/supabase/client";
+import { createClient } from "../../../utils/supabase/server";
 import { uuid } from "uuidv4";
+import { Commission } from "../../../types/commission";
 
 // Create a new Supabase client
 const supabase = createClient();
 
-//Middleware to check user authentication
-
-// Define the Commission interface
-interface Commission {
-  //id: string;
-  title: string;
-  description: string | null;
-  creator_id: string | null;
-  commissioner_id: string;
-  price?: number | null;
-  media_storage: string;
-  created_at: Date;
-  is_mature: boolean;
-  status:
-    | "Requested"
-    | "In-Progress"
-    | "Accepted"
-    | "Rejected"
-    | "Completed"
-    | "Canceled"
-    | "On-Hold"
-    | null;
-  media_type:
-    | "digital_art"
-    | "physical"
-    | "animation"
-    | "video"
-    | "other"
-    | null;
-}
 // Create a new commission endpoint
 export async function POST(req: NextRequest, res: NextRequest) {
   try {
@@ -45,8 +16,9 @@ export async function POST(req: NextRequest, res: NextRequest) {
     console.log("Incoming Request Body:", req.body);
     const body = await req.json();
     console.log("Parsed Request Body:", body);
-    // Create a new commission object. Supabase generates the commissions ID
-    const testCommisionId = uuid();
+    // Create a new commission object using the Commission interface. Supabase generates the commissions ID
+    // const testCommisionId = uuid();
+
     const newCommission: Commission = {
       title: body.title,
       description: body.description,

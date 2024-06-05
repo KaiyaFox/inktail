@@ -4,7 +4,7 @@ Welcome to InkTail! These Terms of Use govern your use of our platform. By acces
 
 ## Content Guidelines
 
-Our website is a platform for commissioning and creating art, which may include artistic works that depict nudity, sexual content, or mature themes. By using our website, you understand and accept that you may encounter such content.
+Our website is a platform for commissioning and creating art, which may include a users artistic works that depict nudity, sexual content, or mature themes. By using our website, you understand and accept that you may encounter such content.
 
 You agree that:
 - You will not upload, post, or transmit any unlawful, harmful, threatening, abusive, harassing, defamatory, vulgar, obscene, or otherwise objectionable content. This includes but is not limited to:

@@ -3,7 +3,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { NextRouter } from 'next/router';
 import CreateNewCommission from './components/commission/CreateNew';
-import OnboardingPage from './components/OnboardingPage';
 import {Box, Button} from "@radix-ui/themes";
 import LargeSearchBar from "./components/Search/LargeSearchBar";
 

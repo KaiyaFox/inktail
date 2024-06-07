@@ -1,29 +1,45 @@
 "use client";
 
-import React from "react";
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
 import { useRouter } from "next/navigation";
-import {Button, TextField, Progress, Box, Select, Checkbox, Skeleton, Spinner} from "@radix-ui/themes";
-import { ArrowRightIcon} from "@radix-ui/react-icons";
-import { ArrowLeftIcon } from "@radix-ui/react-icons";
-import { Flex, Separator, ScrollArea, Heading, Text, RadioGroup, CheckboxCards } from "@radix-ui/themes";
+import {
+    Button,
+    TextField,
+    Progress,
+    Box,
+    Select,
+    Checkbox,
+    Skeleton,
+    Spinner,
+    Flex,
+    Separator,
+    ScrollArea,
+    Heading,
+    Text,
+    RadioGroup,
+    CheckboxCards
+} from "@radix-ui/themes";
+import { ArrowRightIcon, ArrowLeftIcon} from "@radix-ui/react-icons";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { CreateNewAccount } from "../../app/utils/Helpers/accountHelper";
 
-// TODO: Add input validation using Yup
 // set validation schema
 let validationSchema = Yup.object().shape({
     username: Yup.string()
         .required('Username is required')
         .min(3, 'Username must be at least 3 characters')
-        .max(20, 'Username must be less than 20 characters'),
+        .max(20, 'Username must be less than 20 characters')
+        .matches(/^[a-zA-Z0-9_]*$/, 'Username must contain only letters, numbers, and underscores'),
+
 });
 
 const OnboardingPage = () => {
     // Set state variables for the onboarding steps
     const [step, setStep] = useState(1);
+    const [disableNext, setDisableNext] = useState(false);
     const [username, setUsername] = useState("");
     const [gender, setGender] = useState("");
     const [creator, setCreator] = useState("false");
@@ -31,9 +47,21 @@ const OnboardingPage = () => {
     const [progress, setProgress] = useState(0);
 
 
-    // Calculate the progress of the onboarding
+    // Formik input validation initialization
+    const formik = useFormik({
+        initialValues: {
+            username: '',
+            // add more fields here
+        },
+        validationSchema: validationSchema,
+        onSubmit: values => {
+            console.log('Form data:', values);
+        },
+    });
 
-    const totalSteps = 4;
+
+    // Calculate the progress of the onboarding steps
+    const totalSteps = 4; // Change this when adding more steps
 
     const incrementProgress = () => {
         setProgress(progress + 100 / totalSteps);
@@ -62,6 +90,7 @@ const OnboardingPage = () => {
         }
     const router = useRouter();
 
+    // Log the state of the onboarding steps
     useEffect(() => {
         console.log('username:', username);
         console.log('gender:', gender);
@@ -82,6 +111,9 @@ const OnboardingPage = () => {
                 setUsername={setUsername}
                 gender={gender}
                 setGender={setGender}
+                formik={formik}
+                setDisableNext={setDisableNext}
+                disableNext={disableNext}
             />}
 
             {step === 2 && <IsCreator
@@ -104,6 +136,13 @@ const OnboardingPage = () => {
             {step === 5 &&
                 <FinalizeAccount
                 onNext={() => router.push('/')}
+                username={username}
+                gender={gender}
+                creator={creator}
+                commissionPreferences={commissionPreferences}
+                    //TODO: Find out how to pass this variable thats not in the Parent state
+                tosAgree={tosAgree}
+
             />}
         </div>
     );
@@ -112,13 +151,23 @@ const OnboardingPage = () => {
 // Onboarding steps
 
 // Step 1: Set a username and profile information
-const CreateUserName = ({ onNext, setUsername, username, gender, setGender }) => (
+const CreateUserName = ({ onNext, setUsername, username, gender, setGender, formik, setDisableNext, disableNext }) => {
+
+    // Check for errors in formik and disable the next button if there are errors
+    if (formik.errors.username) {
+        setDisableNext(true)
+    } else {
+        setDisableNext(false)
+    }
+
+    return (
+
   <div>
       <Text align={"center"} as={"div"}>
           <Heading>Welcome to InkTail!</Heading>
       </Text>
     <Text align={"center"} as={"div"} size={"6"}>Lets get started setting up your account.</Text>
-    <form>
+    <form onSubmit={formik.handleSubmit}>
       <p>Step 1: Profile Information</p>
         <p>Choose a username</p>
       <label htmlFor="username">Username:</label>
@@ -126,9 +175,12 @@ const CreateUserName = ({ onNext, setUsername, username, gender, setGender }) =>
           type="text"
           id="username" name={username}
           placeholder={"Enter a username"}
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={formik.values.username}
+          onChange={formik.handleChange}
       />
+
+        {formik.errors.username? <Text color={"red"} size={"5"}> 😔 {formik.errors.username}</Text> : null}
+
         <p>Gender</p>
         <Select.Root onValueChange={setGender} value={gender}>
             <Select.Trigger />
@@ -141,18 +193,15 @@ const CreateUserName = ({ onNext, setUsername, username, gender, setGender }) =>
                 </Select.Group>
             </Select.Content>
         </Select.Root>
-
         <Flex direction="column" gap="3">
             <Separator color="indigo" size="4" />
         </Flex>
-
-
-      <Button type="submit" onClick={onNext}>
+      <Button type="submit" onClick={onNext} disabled={disableNext}>
         Next <ArrowRightIcon />
       </Button>
     </form>
   </div>
-);
+)};
 
 // Step 2: Are you a creator?
 const IsCreator = ({ onNext, onback: onBack, creator, setCreator }) => (
@@ -219,11 +268,23 @@ const ChooseMediaTypes = ({onNext, onback}) => (
 
 // Step 4: Agree to terms and conditions
 // Get tos from the server.
-const TermsAndConditions = ({onNext, onback}) => {
+const TermsAndConditions = ({onNext, onback, }) => {
     // Set state variables for the terms and conditions
     const [loading, setLoading] = useState(true);
     const [tos, setTos] = useState('');
-    const [checked, setChecked] = useState(false);
+    const [tosAgree, setTosAgree] = useState(false);
+    //TODO: Disable next button if tosAgree is false
+
+
+    useEffect(() => {
+        console.log('tosAgree:', tosAgree);
+        if (tosAgree === true) {
+            console.log('tosAgree is true')
+        } else {
+            console.log('tosAgree is false')
+        }
+    }, [tosAgree]);
+
 
     // Fetch the terms and conditions from the server
     useEffect(() => {
@@ -270,14 +331,14 @@ const TermsAndConditions = ({onNext, onback}) => {
             </ScrollArea>
             <Text as="label" size="5" >
                 <Flex gap="5">
-                    <Checkbox size={"3"} onChange={(e) => setChecked((e.target as HTMLInputElement).checked)} />
+                    <Checkbox size={"3"} onChange={(e) => setTosAgree((e.target as HTMLInputElement).checked)} />
                     I Agree to Terms and Conditions shown above
                 </Flex>
             </Text>
             <Button type="submit" onClick={onback}>
                 <ArrowLeftIcon />Back
             </Button>
-            <Button type="submit" onClick={onNext}>
+            <Button type="submit" onClick={onNext} disabled={tosAgree}>
                 Finish<ArrowRightIcon />
             </Button>
         </div>
@@ -285,15 +346,36 @@ const TermsAndConditions = ({onNext, onback}) => {
 };
 // Step 5: Finalize account
 // Run any final setup tasks and create the account
-const FinalizeAccount = ({onNext}) => (
-    // TODO: Add final setup tasks here
-    <div>
-        <Heading>Creating your shiny new InkTail account ✨</Heading>
-        <Text></Text>
-        <Button loading type="submit" onClick={onNext}>
-            Finish<ArrowRightIcon />
-        </Button>
-    </div>
-);
+const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferences, tosAgree}) => {
+    // Convert to formData and send to the server
+    const finalizeAccount = async () => {
+        // Gather the state variables into a formData object
+        const formData = {
+            username,
+            gender,
+            creator,
+            commissionPreferences,
+            tosAgree,
+        };
+
+        try {
+            // Pass the formData object to the CreateNewAccount helper function
+            await CreateNewAccount(formData);
+            onNext();
+        } catch (error) {
+            console.error('Failed to create user:', error);
+        }
+    };
+
+    return (
+        <div>
+            <Heading>Creating your shiny new InkTail account ✨</Heading>
+            <Text></Text>
+            <Button loading type="submit" onClick={finalizeAccount}>
+                Finish<ArrowRightIcon />
+            </Button>
+        </div>
+    );
+};
 
 export default OnboardingPage;

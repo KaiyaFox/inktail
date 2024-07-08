@@ -2,7 +2,6 @@
 'use client'
 import React, { useState } from 'react';
 import {Flex, Text, Button, TextArea, Checkbox, TextField} from '@radix-ui/themes';
-
 import { createClient } from '../../utils/supabase/client';
 import FileUploader from '../Uploader/FileUploader';
 

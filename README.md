@@ -6,7 +6,7 @@
 Existing commission-based platforms often struggle with ineffective communication channels and unreliable service, leading to frustration among users. Many platforms lack robust features for seamless collaboration, while others suffer from issues like ghosting.
 
 ### The Solution
-InkTail addresses these challenges by providing a dedicated platform tailored for artists and commissioners. Our solution empowers creators and clients to communicate efficiently and collaborate seamlessly within the same ecosystem.
+InkTail addresses these challenges by providing a dedicated platform tailored for creators and commissioners. Our solution empowers creators and clients to communicate efficiently and collaborate seamlessly within the same ecosystem.
 
 ## MVP (Minimum Viable Product)
 
@@ -49,7 +49,7 @@ Here is what the structure looks like:
 
 
 ### Creator Profiles
-InkTail focuses on artists and creators. So the Creator Profiles should be elegently designed and easy to navigate. For the MVP we will only be looking to have these features and options:
+InkTail focuses on creators. So the Creator Profiles should be elegently designed and easy to navigate. For the MVP we will only be looking to have these features and options:
 
 - Commission Status Indicator: Allow creator to set a public status on commission availability. Commission Closed | Commissions Open
 - Profile picture: Basic upload of a PFP.

@@ -13,7 +13,7 @@ const supabase = createClient(
 interface User {
   email: string;
   password: string;
-  displayname: string;
+  username: string;
   role?: string;
 }
 
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const newUser: User = {
       email: body.email,
       password: body.password,
-      displayname: body.username,
+      username: body.username,
       role: body.role,
     };
     // Validate the user

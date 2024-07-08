@@ -1,5 +1,5 @@
 'use client'
-import {Flex, Text, Button, Box, Heading, Avatar} from '@radix-ui/themes';
+import {Flex, Text, Button, Box, Heading, Avatar, Link} from '@radix-ui/themes';
 import React from "react";
 import SmallSearchBar from "./Search/SmallSearchBar";
 import { useRouter } from 'next/navigation';
@@ -11,9 +11,13 @@ export default function Navbar() {
     const handleClick = () => {
         router.push('/login');
     };
+    // Push to home page
+    const goHome = () => {
+        router.push('/');
+    }
     return (
         <>
-            <Box width="100%" height="100%">
+            <Box width="100%">
             <nav style={{
                 backgroundColor: "#412368",
                 color: "#fff",
@@ -23,16 +27,12 @@ export default function Navbar() {
                 justifyContent: "space-between", // Add this
             }}>
                 <Box>
-                    <Heading>InkTail</Heading>
+                    <Link size={"7"} onClick={goHome}
+                        style={{fontSize: '28px', cursor: 'var(--cursor-link)'}}>InkTail
+                    </Link>
                     <p>Commission based art platform</p>
 
                 </Box>
-                <Box>
-                    <Avatar
-                        src = "https://cdn.discordapp.com/avatars/1234567890/abcdef1234567890abcdef1234567890.png"
-                        fallback={"TFP"} />
-                </Box>
-                <SmallSearchBar/>
 
                 <Box>
                     <Flex gap="3">

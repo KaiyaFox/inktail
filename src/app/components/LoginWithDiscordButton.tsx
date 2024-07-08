@@ -1,12 +1,19 @@
 "use client";
 
 import React from 'react';
-import { NextResponse, NextRequest } from 'next/server';
+import { useContext } from 'react';
 import { createClient } from "../utils/supabase/client";
+import {createUser, testConnection} from "../utils/Helpers/accountHelper";
 import { useRouter } from 'next/navigation';
+import UserDataContext from "../../contexts/userDataContext";
 import Image from 'next/image';
 import { middleware } from '../../middleware';
-import {Button, Avatar, Flex, Skeleton} from "@radix-ui/themes";
+import {Button, Avatar, Flex, Skeleton, Box, HoverCard, Link, Heading, Text, Badge} from "@radix-ui/themes";
+import { ExitIcon } from '@radix-ui/react-icons';
+import {User} from "@supabase/auth-helpers-nextjs";
+import {boolean} from "yup";
+import * as test from "node:test";
+import userDataContext from "../../contexts/userDataContext";
 
 interface LoginWithDiscordButtonProps {
     user?: any;
@@ -16,12 +23,13 @@ interface LoginWithDiscordButtonProps {
 }
 
 const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) => {
-    const [user, setUser] = React.useState<null | any>(null);
+    const { user, setUser, session, setSession, isOnboarded, setIsOnboarded, userId, setUserId, setEmail, setUsername, setAvatarUrl } = useContext(UserDataContext);
+
     const [loading, setLoading] = React.useState<boolean>(false);
-    const [session, setSession] = React.useState<any>(null);
     const router = useRouter();
 
     const supabase = createClient()
+
 
     // Handle logging in.
     const handleLogin = async () => {
@@ -35,14 +43,14 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                     redirectTo: 'http://localhost:3000/',
                     queryParams: {},
                 },
-
             })
             if (error) {
                 console.error('Error signing in with Discord:', error.message)
                 setLoading(false)
-                return
+
             }
             console.log('Signed in with Discord:', data)
+
         } catch (error) {
             setLoading(false)
             console.error('Some error occurred:', error)
@@ -51,26 +59,56 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
     }
 
     // Handle logging out.
+
+
     const handleLogout = async () => {
+
         try {
             console.log('Logging out...')
             const { error } = await supabase.auth.signOut()
-            // refresh the page
-            console.log('Redirecting to home page...')
-            setUser(null)
-
             if (error) {
                 console.error('Error logging out:', error.message)
                 return
             }
             console.log('Logged out successfully')
+            setUser(null)
+            router.refresh();
+            // router.push('/')
+
         } catch (error) {
             console.error('Some error occurred:', error)
-            router.refresh();
         }
     }
+    /**
+     *
+     * */
+    // Hook to check if user exists and has completed onboarding
+    React.useEffect(() => {
+        // Check if user has set up account and completed onboarding
+        async function onboardChecker() {
+            console.log('Checking onboarding status...')
+            const status = await createUser(userId, session)
+            if (status === false) {
+                console.log('User has not completed onboarding')
+                setIsOnboarded(status)
+                router.push('/setup')
+            } else if (status === null) {
+                console.error('Error fetching onboarding status')
+            } else {
+                console.log('User has completed onboarding')
+                setIsOnboarded(status)
+                console.log(isOnboarded)
+                // router.push(`/${userId}`)
+            }
 
-    // Get the session on load.
+        }
+        if (userId) {
+            onboardChecker()
+        }
+    }, [userId, session])
+
+
+    // Get the session when the component mounts.
     React.useEffect(() => {
 
         const getSessionData = async () => {
@@ -84,13 +122,17 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                 const fetchUser = async () => {
                     const { data: { user } } = await supabase.auth.getUser()
                     setUser(user)
-                    console.log('User:', user)
+                    setUserId(user.id)
+                    setEmail(user.email)
+                    setUsername(user.user_metadata.custom_claims.global_name)
+                    setAvatarUrl(user.user_metadata.avatar_url)
+                    setSession(session)
                 }
                 await fetchUser()
 
                 console.log('Access token:', token);
             } else {
-                console.log('No active session');
+                console.log('No active user session');
             }
             // Listen for changes to the auth state to update the session.
             const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -104,7 +146,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                         console.log('Session Expires At:', expiresAt);
                         setSession(session)
                     } else {
-                        console.log('Session Expired:', session);
+                        console.log('Session status:', session);
                         setSession(null)
                     }
                 }
@@ -115,25 +157,76 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
             };
 
         }
-        getSessionData()
-    }, [supabase.auth])
+        (async () => {
+            await getSessionData();
+        })();
+    }, [supabase.auth, router]);
 
     return (
         <>
             {loading && <Skeleton />}
             {user ? (
                 <>
-                    <Flex align="center" gap={"4"}>
-                        <Avatar
-                            radius={"large"}
-                            size = "4"
-                            src={user.user_metadata.avatar_url}
-                            fallback={user.user_metadata.custom_claims.global_name.charAt(0)}
-                        />
-                    </Flex>
-                    <Button size={"1"} onClick={handleLogout}>
-                        Logout
-                    </Button></>
+                    <Box>
+                        <Flex align="center" gap={"4"}>
+                            <HoverCard.Root>
+                                <HoverCard.Trigger>
+                                    <Avatar
+                                        radius={"large"}
+                                        size = "5"
+                                        src={user.user_metadata.avatar_url}
+                                        fallback={user.user_metadata.custom_claims.global_name.charAt(0)}
+                                    />
+
+                                </HoverCard.Trigger>
+
+                                <HoverCard.Content maxWidth="300px">
+                                    <Flex gap="5">
+                                        <Avatar
+                                            size="3"
+                                            fallback={user.user_metadata.custom_claims.global_name.charAt(0)}
+                                            radius="full"
+                                            src={user.user_metadata.avatar_url}
+                                        />
+                                        <Box>
+
+                                            <Heading size="3" as="h3">
+                                                {user.user_metadata.custom_claims.global_name}
+                                            </Heading>
+                                            {}
+                                            <Badge variant="surface" radius="full" color="purple">
+                                                Creator
+                                            </Badge>
+                                            <Text as="div" size="2" color="gray" mb="2">
+                                                {user.email}
+                                            </Text>
+                                            <Text as="div" size="1">
+                                                <Box>
+                                                    <Button size={"2"} color={"purple"}>View Profile</Button>
+                                                    <Box>
+                                                        <Button mb={'3'} size={"2"} color={"purple"}>Favourites</Button>
+                                                    </Box>
+                                                    <Box>
+                                                        <Button mb={'3'} size={"2"} color={"purple"}>Settings</Button>
+
+                                                    </Box>
+                                                    <Button size={"2"} color={"red"} onClick={handleLogout}>
+                                                        Logout <ExitIcon />
+                                                    </Button>
+
+                                                </Box>
+
+                                            </Text>
+                                        </Box>
+                                    </Flex>
+                                </HoverCard.Content>
+                            </HoverCard.Root>
+                        </Flex>
+                    </Box>
+
+
+
+                </>
             ) : (
                 <Button color="red" onClick={handleLogin}>
                     Login

@@ -6,10 +6,10 @@ export default function LargeSearchBar() {
     return (
         <>
             <Box style={{ borderRadius: 'var(--radius-3)' }}>
-                <Container size={"4"}>
+                <Container size={"3"}>
                     <Box width="100%" height="100%">
                         <TextField.Root placeholder="Search for an artist, character, or theme... 🦊" size={"3"}
-                                        color={"pink"}
+                                        color={"purple"}
                                         variant={"soft"}
                                         style={{ height: "75px"}}
                         >

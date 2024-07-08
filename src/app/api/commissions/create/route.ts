@@ -1,16 +1,18 @@
-// Create a new commission
+// API route creates a new commission by inserting a new row into the commissions table in the database
 
 import { NextResponse, NextRequest } from "next/server";
 import { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "../../../utils/supabase/server";
 import { uuid } from "uuidv4";
 import { Commission } from "../../../types/commission";
+import { headers } from "next/headers";
 
 // Create a new Supabase client
 const supabase = createClient();
 
-// Create a new commission endpoint
+// Create commission endpoint
 export async function POST(req: NextRequest, res: NextRequest) {
+    const headersList = headers();
   try {
     // Log the entire request body received
     console.log("Incoming Request Body:", req.body);
@@ -51,6 +53,7 @@ export async function POST(req: NextRequest, res: NextRequest) {
         status: newCommission.status,
       })
       .select();
+
     // Return the responses
     return NextResponse.json({ commissionData: data, error });
   } catch (error) {

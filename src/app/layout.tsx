@@ -5,6 +5,7 @@ import "./globals.css";
 import { Theme } from '@radix-ui/themes';
 import Navbar from "./components/Navbar";
 import '@radix-ui/themes/styles.css';
+import UserProvider from "../contexts/UserProvider";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,14 +21,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-    <body>
-    <Theme accentColor="crimson" grayColor="sand" radius="small" scaling="95%" appearance="dark">
-    <Navbar />
-    {children}
-    <Footer />
-    </Theme>
-    </body>
-    </html>
+      <html lang="en">
+      <body>
+      <UserProvider> {/* Context for global state user data */}
+        <Theme accentColor="purple" grayColor="mauve" radius="small" scaling="100%" appearance="dark">
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Navbar />
+            <main style={{ flexGrow: 1 }}>
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </Theme>
+      </UserProvider>
+      </body>
+      </html>
   );
 }

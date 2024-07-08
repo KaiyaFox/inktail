@@ -17,6 +17,7 @@ const HomePage: React.FC = () => {
       <>
           <Box>
               <LargeSearchBar/>
+              <CreateNewCommission/>
           </Box>
 
       </>

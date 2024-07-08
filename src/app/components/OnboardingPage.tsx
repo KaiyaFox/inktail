@@ -1,5 +1,10 @@
 "use client";
 
+// Handle the form submission for setting up a new account
+// This component will guide the user through the onboarding process to create a new user account.
+
+// TODO: Modularize the onboarding steps into separate components.
+
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
@@ -23,18 +28,35 @@ import {
 } from "@radix-ui/themes";
 import { ArrowRightIcon, ArrowLeftIcon} from "@radix-ui/react-icons";
 import * as Yup from "yup";
-import { useFormik } from "formik";
-import { CreateNewAccount } from "../../app/utils/Helpers/accountHelper";
+import { useFormik, FieldArray, FieldArrayRenderProps} from "formik";
+import {CreateNewAccount} from "../../app/utils/Helpers/accountHelper";
 
-// set validation schema
+// Setup validation schema for the form inputs.
+// TODO: Replace all traditional react forms with Formik forms.
 let validationSchema = Yup.object().shape({
     username: Yup.string()
         .required('Username is required')
         .min(3, 'Username must be at least 3 characters')
         .max(20, 'Username must be less than 20 characters')
         .matches(/^[a-zA-Z0-9_]*$/, 'Username must contain only letters, numbers, and underscores'),
-
+    media_type: Yup.string()
+        .oneOf(['digital', 'traditional', 'textile', 'model'])
+        .required('Please select at least one media type'),
+    creatorMode: Yup.boolean()
+        .required('Please select an option'),
+    gender: Yup.string()
+        .oneOf(['male', 'female', 'non-binary']),
+    tosAgree: Yup.boolean()
+        .required('Please agree to the terms and conditions to continue using InkTail')
+        .oneOf([true], 'Please agree to the terms and conditions to continue using InkTail'),
 });
+
+interface OnboardingProps {
+    email: string;
+    userId: string;
+    provider: string;
+}
+
 
 const OnboardingPage = () => {
     // Set state variables for the onboarding steps
@@ -45,12 +67,20 @@ const OnboardingPage = () => {
     const [creator, setCreator] = useState("false");
     const [commissionPreferences, setCommissionPreferences] = useState([]);
     const [progress, setProgress] = useState(0);
+    const [tosAgree, setTosAgree] = useState(false);
+    const [onBoarded, setOnBoarded] = useState(false);
 
 
     // Formik input validation initialization
+    // Set up the formik hook and the validation schema
     const formik = useFormik({
+        // Set the type of formik values
         initialValues: {
             username: '',
+            mediaTypes: [''],
+            gender: '',
+            creatorMode: false,
+            tosAgree: false,
             // add more fields here
         },
         validationSchema: validationSchema,
@@ -84,21 +114,22 @@ const OnboardingPage = () => {
         }
     }
 
-        const backStep = () => {
-            setStep(step - 1);
-            decrementProgress();
-        }
+    const backStep = () => {
+        setStep(step - 1);
+        decrementProgress();
+    }
     const router = useRouter();
 
-    // Log the state of the onboarding steps
+    // Log the state of the onboarding steps and re-render when the state changes
     useEffect(() => {
-        console.log('username:', username);
-        console.log('gender:', gender);
-        console.log('creator:', creator);
-        console.log('commissionPreferences:', commissionPreferences);
-        console.log('step:', step);
-        console.log('progress:', progress);
-    }, [username, gender, creator, commissionPreferences, step, progress]);
+        // console.log('username:', username);
+        // console.log('gender:', gender);
+        // console.log('creator:', creator);
+        // console.log('commissionPreferences:', commissionPreferences);
+        // console.log('step:', step);
+        // console.log('progress:', progress);
+        console.log('Formik:', formik.values)
+    }, [formik.values]);
 
     return (
         <div>
@@ -107,8 +138,8 @@ const OnboardingPage = () => {
             </Box>
             {step === 1 && <CreateUserName
                 onNext={nextStep}
-                username={username}
-                setUsername={setUsername}
+                // username={formik.values.username}
+                // setUsername={setUsername}
                 gender={gender}
                 setGender={setGender}
                 formik={formik}
@@ -116,34 +147,39 @@ const OnboardingPage = () => {
                 disableNext={disableNext}
             />}
 
-            {step === 2 && <IsCreator
+            {step === 2 && <CreatorMode
                 onNext={nextStep}
                 onback={backStep}
-                creator={creator}
-                setCreator={setCreator}
+                // creator={creator}
+                // setCreator={setCreator}
+                formik={formik}
             />}
 
             {step === 3 && <ChooseMediaTypes
                 onNext={nextStep}
                 onback={backStep}
+                formik={formik}
             />}
 
             {step === 4 &&
                 <TermsAndConditions
-                onNext={nextStep}
-                onback={backStep}
-            />}
+                    onNext={nextStep}
+                    onback={backStep}
+                    // tosAgree={tosAgree}
+                    // setTosAgree={setTosAgree}
+                    formik={formik}
+                />}
             {step === 5 &&
                 <FinalizeAccount
-                onNext={() => router.push('/')}
-                username={username}
-                gender={gender}
-                creator={creator}
-                commissionPreferences={commissionPreferences}
-                    //TODO: Find out how to pass this variable thats not in the Parent state
-                tosAgree={tosAgree}
+                    onNext={() => router.push('/')}
+                    formikValues={formik.values}
+                    username={formik.values.username}
+                    gender={formik.values.gender}
+                    creator={formik.values.creatorMode}
+                    commissionPreferences={formik.values.mediaTypes}
+                    tosAgree={formik.values.tosAgree} // Lifted state from TermsAndConditions component.
 
-            />}
+                />}
         </div>
     );
 };
@@ -151,142 +187,172 @@ const OnboardingPage = () => {
 // Onboarding steps
 
 // Step 1: Set a username and profile information
-const CreateUserName = ({ onNext, setUsername, username, gender, setGender, formik, setDisableNext, disableNext }) => {
-
+const CreateUserName = ({onNext, formik, setDisableNext, disableNext}) => {
     // Check for errors in formik and disable the next button if there are errors
-    if (formik.errors.username) {
-        setDisableNext(true)
-    } else {
-        setDisableNext(false)
-    }
+    useEffect(() => {
+        if (formik.errors.username) {
+            setDisableNext(true)
+        } else {
+            setDisableNext(false)
+        }
+    }, [formik.errors.username, setDisableNext]);
 
     return (
+        <div>
+            <Text align={"center"} as={"div"}>
+                <Heading>Welcome to InkTail!</Heading>
+            </Text>
+            <Text align={"center"} as={"div"} size={"6"}>Lets get started setting up your account.</Text>
+            <form onSubmit={formik.handleSubmit}>
+                <p>Step 1: Profile Information</p>
+                <p>Choose a username</p>
+                <label htmlFor="username">Username:</label>
+                <TextField.Root
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder={"Enter a username"}
+                    value={formik.values.username}
+                    onChange={formik.handleChange}
+                />
+                {formik.errors.username ? <Text color={"red"} size={"5"}> 😔 {formik.errors.username}</Text> : null}
+                <p>Gender</p>
+                <Select.Root
+                    name="gender"
+                    onValueChange={(value) => formik.handleChange({target: {name: 'gender', value}})}
+                    value={formik.values.gender}>
 
-  <div>
-      <Text align={"center"} as={"div"}>
-          <Heading>Welcome to InkTail!</Heading>
-      </Text>
-    <Text align={"center"} as={"div"} size={"6"}>Lets get started setting up your account.</Text>
-    <form onSubmit={formik.handleSubmit}>
-      <p>Step 1: Profile Information</p>
-        <p>Choose a username</p>
-      <label htmlFor="username">Username:</label>
-      <TextField.Root
-          type="text"
-          id="username" name={username}
-          placeholder={"Enter a username"}
-          value={formik.values.username}
-          onChange={formik.handleChange}
-      />
+                    <Select.Trigger/>
+                    <Select.Content>
+                        <Select.Group>
+                            <Select.Label>Gender</Select.Label>
+                            <Select.Item value="male">Male</Select.Item>
+                            <Select.Item value="female">Female</Select.Item>
+                            <Select.Item value="non-binary">Non-binary</Select.Item>
+                        </Select.Group>
+                    </Select.Content>
+                </Select.Root>
+                <Flex direction="column" gap="3">
+                    <Separator color="indigo" size="4"/>
+                </Flex>
+                <Button type="submit" onClick={onNext} disabled={disableNext}>
+                    Next <ArrowRightIcon/>
+                </Button>
+            </form>
+        </div>
+    );
+};
 
-        {formik.errors.username? <Text color={"red"} size={"5"}> 😔 {formik.errors.username}</Text> : null}
-
-        <p>Gender</p>
-        <Select.Root onValueChange={setGender} value={gender}>
-            <Select.Trigger />
-            <Select.Content>
-                <Select.Group>
-                    <Select.Label>Gender</Select.Label>
-                    <Select.Item value="male">Male</Select.Item>
-                    <Select.Item value="female">Female</Select.Item>
-                    <Select.Item value="non-binary">Non-binary</Select.Item>
-                </Select.Group>
-            </Select.Content>
-        </Select.Root>
-        <Flex direction="column" gap="3">
-            <Separator color="indigo" size="4" />
-        </Flex>
-      <Button type="submit" onClick={onNext} disabled={disableNext}>
-        Next <ArrowRightIcon />
-      </Button>
-    </form>
-  </div>
-)};
-
-// Step 2: Are you a creator?
-const IsCreator = ({ onNext, onback: onBack, creator, setCreator }) => (
+// Step 2: Determines if the user wants to accept commission requests and use creator options
+const CreatorMode = ({onNext, onback: onBack, formik}) => (
     <div>
         <Heading>Step 2: Would you like to accept commission requests on InkTail?</Heading>
         <p>You can always change this later.</p>
 
-        <RadioGroup.Root name="creator" size={"3"} value={creator} onValueChange={setCreator}>
+        <RadioGroup.Root
+            name="creator"
+            size={"3"}
+            value={formik.values.creatorMode}
+            // Using inline function to pass the value to formik
+            onValueChange={(value) => formik.handleChange({target: {name: 'creatorMode', value}})}>
             <RadioGroup.Item value="true">Yes</RadioGroup.Item>
             <RadioGroup.Item value="false">No</RadioGroup.Item>
-            {creator}
         </RadioGroup.Root>
 
         <Button type="submit" onClick={onBack}>
-            <ArrowLeftIcon />Back
+            <ArrowLeftIcon/>Back
         </Button>
         <Button type="submit" onClick={onNext}>
-            Next<ArrowRightIcon />
+            Next<ArrowRightIcon/>
         </Button>
     </div>
 );
 
 // Step 3: Choose media types
-const ChooseMediaTypes = ({onNext, onback}) => (
-<div>
-<Box width={"50%"}>
-        <CheckboxCards.Root columns={{ initial: "1", sm: '2' }}>
-            <CheckboxCards.Item value="digital" >
-                <Flex direction="column" width="100%">
-                    <Text weight="bold">Digital Art</Text>
-                    <Text>Art created digitally using computer peripheral tools.</Text>
-                </Flex>
-            </CheckboxCards.Item>
-            <CheckboxCards.Item value="traditional" id={"traditional"}>
-                <Flex direction="column" width="100%">
-                    <Text weight="bold">Classical Art</Text>
-                    <Text>Art created with traditional paint, canvases, brushes, pencils.</Text>
-                </Flex>
-            </CheckboxCards.Item>
-            <CheckboxCards.Item value="textile">
-                <Flex direction="column" width="100%">
-                    <Text weight="bold">Textile and Fashion</Text>
-                    <Text>Fursuit, clothing or costumes</Text>
-                </Flex>
-            </CheckboxCards.Item>
-            <CheckboxCards.Item value="model">
-                <Flex direction="column" width="100%">
-                    <Text weight="bold">Sculpture and 3D</Text>
-                    <Text>Figuring, statues and other 3D creations.</Text>
-                </Flex>
-            </CheckboxCards.Item>
+const ChooseMediaTypes = ({onNext, onback, formik}) => {
+    const mediaTypes = {
+        digital: 'Art created digitally using tablets, and art software.',
+        traditional: 'Art created with traditional paint, canvases, brushes, pencils.',
+        textile: 'Clothing or costumes.',
+        model: 'Figurines, miniatures, statues and other 3D creations.',
+        animation: 'Animated art that can be 3D or 2D renders, VR Avatars, or GIF.',
+        photography: 'Still life photos, motion pictures or videos.',
+        test: 'Test',
+    }
+    // TODO: Update formik values when the checkboxes are checked or unchecked.
+    const handleCheckedChange = (mediaType: string, arrayHelpers: FieldArrayRenderProps) => () => {
+        const isChecked = formik.vales.mediaTypes.includes(mediaType);
+        if (!isChecked) {
+            arrayHelpers.push(mediaType);
+        } else {
+            const idx = formik.values.mediaTypes.indexOf(mediaType);
+            if (idx !== -1) {
+                arrayHelpers.remove(idx);
+            }
+        }
+    }
 
-        </CheckboxCards.Root>
+    return (
+        <div>
+            <Box width={"50%"}>
 
-        <Button type="submit" onClick={onback}>
-            <ArrowLeftIcon />Back
-        </Button>
-      <Button type="submit" onClick={onNext}>
-          Next<ArrowRightIcon />
-      </Button>
-</Box>
-  </div>
-);
+                <FieldArray
+                    name="mediaTypes"
+                    render={arrayHelpers => (
+                        <CheckboxCards.Root columns={{initial: "1", sm: '2'}}>
+                            {Object.keys(mediaTypes).map((mediaType) => (
+                                <CheckboxCards.Item
+                                    key={mediaType}
+                                    value={mediaType}
+                                    id={mediaType}
+                                    onChange={handleCheckedChange(mediaType, arrayHelpers)}
+
+
+                                >
+                                    <Flex direction="column" width="100%" align={"start"}>
+                                        <Text size={'5'} weight="bold">{mediaType.charAt(0).toUpperCase() + mediaType.slice(1)}</Text>
+                                        <Text>{mediaTypes[mediaType]}</Text>
+                                    </Flex>
+                                    {/* ... */}
+                                </CheckboxCards.Item>
+                            ))}
+                        </CheckboxCards.Root>
+                    )}
+                />
+                <Button type="submit" onClick={onback}>
+                    <ArrowLeftIcon/>Back
+                </Button>
+
+                <Button type="submit" onClick={onNext}>
+                    Next<ArrowRightIcon/>
+                </Button>
+            </Box>
+        </div>
+
+    )
+}
+
 
 // Step 4: Agree to terms and conditions
 // Get tos from the server.
-const TermsAndConditions = ({onNext, onback, }) => {
+const TermsAndConditions = ({onNext, onback, formik}) => {
     // Set state variables for the terms and conditions
     const [loading, setLoading] = useState(true);
     const [tos, setTos] = useState('');
-    const [tosAgree, setTosAgree] = useState(false);
     //TODO: Disable next button if tosAgree is false
 
+    const tosAgree = formik.values.tosAgree;
 
     useEffect(() => {
-        console.log('tosAgree:', tosAgree);
         if (tosAgree === true) {
-            console.log('tosAgree is true')
+            console.log('tosAgree is true', tosAgree)
         } else {
-            console.log('tosAgree is false')
+            console.log('tosAgree is false', tosAgree)
         }
     }, [tosAgree]);
 
 
-    // Fetch the terms and conditions from the server
+    // Fetch the terms and conditions from the backend server
     useEffect(() => {
         setLoading(true)
 
@@ -296,13 +362,13 @@ const TermsAndConditions = ({onNext, onback, }) => {
         setLoading(false)
         // console.log(tos)
     }, []);
-
+    // TODO: Get TOS checkbox state using Formik.
     return (
         <div>
             <h1>Step 4: Terms and Conditions</h1>
             <p>By clicking the button below, you agree to the InkTail terms and conditions</p>
             <br></br>
-            <ScrollArea type="always" scrollbars="vertical" style={{ height: 500, width: 500}}>
+            <ScrollArea type="always" scrollbars="vertical" style={{height: 500, width: 500}}>
                 {loading ? (
                     <Skeleton/>
                 ) : (
@@ -331,35 +397,46 @@ const TermsAndConditions = ({onNext, onback, }) => {
             </ScrollArea>
             <Text as="label" size="5" >
                 <Flex gap="5">
-                    <Checkbox size={"3"} onChange={(e) => setTosAgree((e.target as HTMLInputElement).checked)} />
-                    I Agree to Terms and Conditions shown above
+                    <Checkbox
+                        name="tosAgree"
+                        size={"3"}
+                        checked={formik.values.tosAgree}
+                        onCheckedChange={(value) => formik.handleChange({target: {name: 'tosAgree', value}})}
+                    />
+                    <Text>I Agree to Terms and Conditions shown above</Text>
+
+
+
                 </Flex>
+                <Flex align={'center'}>
+                    <Separator orientation={"horizontal"}/>
+                </Flex>
+                <Text>{formik.errors.tosAgree ? <Text color={"red"} size={"5"}> 😔 {formik.errors.tosAgree}</Text> : null}</Text>
             </Text>
             <Button type="submit" onClick={onback}>
                 <ArrowLeftIcon />Back
             </Button>
-            <Button type="submit" onClick={onNext} disabled={tosAgree}>
+            <Button type="submit" onClick={onNext} disabled={!tosAgree}>
                 Finish<ArrowRightIcon />
             </Button>
         </div>
     );
 };
-// Step 5: Finalize account
-// Run any final setup tasks and create the account
-const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferences, tosAgree}) => {
+// Step 5: Finalizing account.
+// Run any final setup tasks and creates the account by sending the form data to the api/user/create endpoint.
+const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferences, tosAgree, formikValues}) => {
     // Convert to formData and send to the server
     const finalizeAccount = async () => {
         // Gather the state variables into a formData object
         const formData = {
-            username,
-            gender,
-            creator,
-            commissionPreferences,
-            tosAgree,
+            ...formikValues,
         };
+
+
 
         try {
             // Pass the formData object to the CreateNewAccount helper function
+            console.log(formData)
             await CreateNewAccount(formData);
             onNext();
         } catch (error) {
@@ -370,8 +447,12 @@ const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferenc
     return (
         <div>
             <Heading>Creating your shiny new InkTail account ✨</Heading>
-            <Text></Text>
-            <Button loading type="submit" onClick={finalizeAccount}>
+            <Text>Before we finish. Does all this info look correct?</Text>
+            <Text>Username: {username}</Text>
+            <Text>Gender: {gender}</Text>
+            <Text>Creator mode: {creator}</Text>
+
+            <Button type="submit" onClick={finalizeAccount}>
                 Finish<ArrowRightIcon />
             </Button>
         </div>

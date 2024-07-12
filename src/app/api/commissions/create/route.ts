@@ -1,17 +1,21 @@
 // API route creates a new commission by inserting a new row into the commissions table in the database
 
 import { NextResponse, NextRequest } from "next/server";
-import { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "../../../utils/supabase/server";
-import { uuid } from "uuidv4";
 import { Commission } from "../../../types/commission";
 import { headers } from "next/headers";
+import { verifyToken} from "../../helpers/verifyToken";
 
 // Create a new Supabase client
 const supabase = createClient();
 
 // Create commission endpoint
-export async function POST(req: NextRequest, res: NextRequest) {
+export async function POST(req: NextRequest, res: NextResponse) {
+    // Verify the user's token
+    const authHeader = req.headers.get('Authorization');
+    const token = authHeader?.split(' ')[1];
+    await verifyToken(token, res);
+
     const headersList = headers();
   try {
     // Log the entire request body received

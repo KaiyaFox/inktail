@@ -47,7 +47,7 @@ export const CreateNewAccount = async (formData: any) => {
  * */
 
 // Checks if the userid exists in the users table. If not, it will create a new user.
-// TODO: Configure RLS policy so we can get the user's onboarding status
+// TODO: Configure RLS policy so we can profile the user's onboarding status
 export const createUser = async (userId: string, sessionData: any): Promise <boolean | PostgrestError> => {
 
     try {

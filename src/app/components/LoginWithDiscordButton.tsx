@@ -40,7 +40,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'discord',
                 options: {
-                    redirectTo: 'http://localhost:3000/',
+                    redirectTo: 'http://192.168.50.11:3000/',
                     queryParams: {},
                 },
             })

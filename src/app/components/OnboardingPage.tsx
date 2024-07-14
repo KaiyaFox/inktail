@@ -132,7 +132,7 @@ const OnboardingPage = () => {
     }, [formik.values]);
 
     return (
-        <div>
+        <Box style={{display: 'flex', justifyContent: "center", alignItems: "center", height: '50vh'}} >
             <Box maxWidth="100%">
                 <Progress value={progress} size={"3"}/>
             </Box>
@@ -180,7 +180,7 @@ const OnboardingPage = () => {
                     tosAgree={formik.values.tosAgree} // Lifted state from TermsAndConditions component.
 
                 />}
-        </div>
+        </Box>
     );
 };
 
@@ -233,11 +233,13 @@ const CreateUserName = ({onNext, formik, setDisableNext, disableNext}) => {
                     </Select.Content>
                 </Select.Root>
                 <Flex direction="column" gap="3">
-                    <Separator color="indigo" size="4"/>
+
                 </Flex>
-                <Button type="submit" onClick={onNext} disabled={disableNext}>
-                    Next <ArrowRightIcon/>
-                </Button>
+                <Box mt={'1'} style={{display: 'flex', alignItems: 'centers', justifyContent: 'right'}}>
+                    <Button type="submit" onClick={onNext} disabled={disableNext}>
+                        Next <ArrowRightIcon/>
+                    </Button>
+                </Box>
             </form>
         </div>
     );

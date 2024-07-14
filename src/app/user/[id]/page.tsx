@@ -1,12 +1,12 @@
 "use client"
-import LoginWithDiscordButton from '../../components/LoginWithDiscordButton'
-import { redirect } from 'next/navigation'
-import { createClient } from '../../utils/supabase/client'
-
-import {useEffect, useContext, useState, use} from "react";
+import {useEffect, useContext, useState} from "react";
 import {useRouter, useSearchParams, usePathname} from "next/navigation";
 import UserDataContext from "../../../contexts/userDataContext";
 import {Box, Heading, Skeleton, Text, Section} from "@radix-ui/themes";
+import CreateSprintDialog from "../../components/commission/Create/CommissionSprint";
+import CreateNewCommission from "../../components/commission/CreateNew";
+import {type} from "typedoc/dist/lib/output/themes/default/partials/type";
+import ManageProfile from "../../components/ProfileViews/MyProfile";
 
 
 interface UserProfile {
@@ -19,10 +19,6 @@ interface UserProfile {
     // Add any other properties you expect to use
 }
 
-
-
-
-// TODO: Use profileHelper function to profile user data
 const UserPage = () => {
     // Get session from global state to use in the fetch request
     const {session} = useContext(UserDataContext); // Destructure the context values you need
@@ -30,14 +26,16 @@ const UserPage = () => {
     // Local state for the user profile
     // TODO: Ensure profile data contains all relevant user data to be displayed
     const [ profile, setProfile ] = useState<UserProfile | null>(null);
+    const [notFound, setNotFound] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [owner, setOwner] = useState<boolean>(false);
+
 
     // Get id parameters from the URL
     const pathname = usePathname();
     const pathSegments = pathname.split('/'); // Split the pathname to profile segments
     const userIdIndex = pathSegments.findIndex(segment => segment === 'user') + 1; // Find the index of 'user' and add 1 to profile the UUID
     const userId = pathSegments[userIdIndex]; // Get the UUID from the array
-
-    console.log('!!!!User ID:', userId); // Use the UUID as needed
 
     // Fetch user data from the API
     useEffect(() => {
@@ -51,6 +49,8 @@ const UserPage = () => {
                             'Authorization': `Bearer ${session.access_token}`
                         },
                     });
+
+
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
@@ -58,6 +58,17 @@ const UserPage = () => {
                     // Update the user context with the fetched data
                     setProfile(data);
                     console.log('Fetched data:', data);
+                    // Check if the user accessing the page the same as the user in the profile
+                    if (data.id === userId) {
+                        setOwner(true);
+                    } else {
+                        setOwner(false);
+                    }
+                    // TODO: Fix state variable of owner not setting correctly
+                    console.log(typeof data.id)
+                    console.log(typeof userId)
+                    console.log(data.id)
+                    console.log('Owner:', owner);
 
                 } catch (error) {
                     console.error('There was a problem with fetching user profile:', error);
@@ -66,56 +77,60 @@ const UserPage = () => {
             };
             fetchData();
         }
-    }, [session, userId]); // Rerun effect if session or userId changes
-    const admin = profile?.is_admin;
-
+    }, [session, userId, owner]); // Rerun effect if session or userId changes
+    if (owner) {
+        return (
+            <Box>
+                <ManageProfile {...profile} />
+            </Box>
+        );
+    }
     return (
-
-        <Box
-            py="9"
-            style={{
-                // backgroundImage: `url(${profile.bannerUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                borderRadius: 'var(--radius-3)',
-                position: 'relative',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '200px',
-            }}
-        >
+        profile ? (
             <Box
+                py="9"
                 style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    borderRadius: 'var(--radius-3)',
+                    position: 'relative',
                     display: 'flex',
-                    flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    padding: '20px',
+                    height: '200px',
                 }}
             >
-                {profile ? (
+                <Box
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '20px',
+                    }}
+                >
                     <>
                         <Text style={{ color: 'white', fontSize: '24px' }}>{profile.username}</Text>
                         <Text style={{ color: 'white', fontSize: '18px' }}>{profile.email}</Text>
                         <Text style={{ color: 'white', fontSize: '16px' }}>Pronouns: {profile.pronouns}</Text>
                         <Text style={{ color: 'white', fontSize: '16px' }}>Gender: {profile.gender}</Text>
-                        <Text style={{ color: 'white', fontSize: '16px' }}>Creator: {profile.creator}</Text>
+                        <Text style={{ color: 'white', fontSize: '16px' }}>Creator: {profile.creator.toString()}</Text>
                         {/* Add more fields as needed */}
                     </>
-                ) : (
-                    <Box>
-                        Loading...
-                    </Box>
-                )}
+                </Box>
             </Box>
-        </Box>
+        ) : (
+            <Box>
+                <Skeleton />
+            </Box>
+
+        )
     );
 };
 

@@ -45,6 +45,7 @@ export default function Navbar() {
 
             </nav>
             </Box>
+
         </>
 
     );

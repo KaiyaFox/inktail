@@ -38,6 +38,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
         // Get user id from the query params
         const userId = req.nextUrl.searchParams.get('id');
+        const username = req.nextUrl.searchParams.get('username');
+
+        if (username) {
+
+        }
 
         // if (!tokenVerified) {
         //     return NextResponse.json({error: "401 Not Authorized: Invalid token"}, {status: 401})
@@ -47,7 +52,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
         }
 
         // Get user profile data from the database
-
         const { data, error } = await supabase
             .from('users')
             .select('*')

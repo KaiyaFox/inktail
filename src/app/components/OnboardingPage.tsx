@@ -31,14 +31,28 @@ import * as Yup from "yup";
 import { useFormik, FieldArray, FieldArrayRenderProps} from "formik";
 import {CreateNewAccount} from "../../app/utils/Helpers/accountHelper";
 
-// Setup validation schema for the form inputs.
+// Form validation schema for input fields
 // TODO: Replace all traditional react forms with Formik forms.
 let validationSchema = Yup.object().shape({
+    // Username validation
     username: Yup.string()
         .required('Username is required')
         .min(3, 'Username must be at least 3 characters')
         .max(20, 'Username must be less than 20 characters')
-        .matches(/^[a-zA-Z0-9_]*$/, 'Username must contain only letters, numbers, and underscores'),
+        .matches(/^[a-zA-Z0-9_]*$/, 'Username must contain only letters, numbers, and underscores')
+        .test('unique-username', 'This username is already taken', async (value) => {
+            if (!value) return false;
+            try {
+                // Check if the username is unique
+                const response = await fetch(`/api/user/username/${value}`);
+                const data = await response.json();
+                return data.isUnique;
+            } catch (error) {
+                console.error('Failed to check username:', error);
+                return false;
+            }
+        }),
+    // Media type validation
     media_type: Yup.string()
         .oneOf(['digital', 'traditional', 'textile', 'model'])
         .required('Please select at least one media type'),
@@ -433,9 +447,7 @@ const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferenc
         const formData = {
             ...formikValues,
         };
-
-
-
+        // Send the formData object to the server
         try {
             // Pass the formData object to the CreateNewAccount helper function
             console.log(formData)
@@ -448,9 +460,10 @@ const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferenc
 
     return (
         <div>
-            <Heading>Creating your shiny new InkTail account ✨</Heading>
-            <Text>Before we finish. Does all this info look correct?</Text>
+            <Heading>Finalize account setup</Heading>
+            <Text>Does all this info look correct?</Text>
             <Text>Username: {username}</Text>
+            <Text>Content you create: {commissionPreferences}</Text>
             <Text>Gender: {gender}</Text>
             <Text>Creator mode: {creator}</Text>
 

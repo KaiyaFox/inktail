@@ -18,13 +18,14 @@ export default function Navbar() {
     return (
         <>
             <Box width="100%">
-            <nav style={{
+            <Box style={{
                 backgroundColor: "#412368",
                 color: "#fff",
                 padding: "1rem",
                 textAlign: "center",
                 display: "flex", // Add this
                 justifyContent: "space-between", // Add this
+                alignItems: "center",
             }}>
                 <Box>
                     <Link size={"7"} onClick={goHome}
@@ -43,7 +44,7 @@ export default function Navbar() {
                 </Box>
 
 
-            </nav>
+            </Box>
             </Box>
 
         </>

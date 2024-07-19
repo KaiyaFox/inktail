@@ -4,6 +4,7 @@ import Footer from "./components/Footer";
 import "./globals.css";
 import { Theme } from '@radix-ui/themes';
 import Navbar from "./components/Navbar";
+import SideBar from "./components/SideBar";
 import '@radix-ui/themes/styles.css';
 import UserProvider from "../contexts/UserProvider";
 import React from "react";

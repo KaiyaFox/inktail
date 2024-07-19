@@ -4,16 +4,16 @@ import {NextResponse} from "next/server";
 
 const supabase = createClient();
 /**
- * Helper function that verifies session token and returns an error if invalid or missing
- *
+ * Helper function that verifies session token and returns an error and halts if invalid or missing
+ * @param {string | null} token - The session token
+ * @example await verifyToken(token)
  */
-export async function verifyToken(token: string | null, res: NextResponse): Promise<void> {
-    const tokenData = await supabase.auth.getUser(token);
-    if (!tokenData || tokenData.error || !token) {
-        tokenData.error && console.log(tokenData.error.message)
-        NextResponse.json({error: "Unauthorized"}, {status: 401})
-        return
-
+export async function verifyToken(token: string | null): Promise<void> {
+    if (!token) {
+        throw new Error("No token provided");
+    }
+    const { error } = await supabase.auth.getUser(token);
+    if (error) {
+        throw new Error("Unauthorized");
     }
 }
-

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { createClient } from "../utils/supabase/client";
 import {createUser, testConnection} from "../utils/Helpers/accountHelper";
 import { useRouter } from 'next/navigation';
@@ -23,8 +23,20 @@ interface LoginWithDiscordButtonProps {
 }
 
 const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) => {
-    const { user, setUser, session, setSession, isOnboarded, setIsOnboarded, userId, setUserId, setEmail, setUsername, setAvatarUrl } = useContext(UserDataContext);
-
+    // Getter and setter functions for user data
+    const {
+        user,
+        setUser,
+        session,
+        setSession,
+        isOnboarded,
+        setIsOnboarded,
+        userId,
+        setUserId,
+        setEmail,
+        setUsername,
+        setAvatarUrl
+    } = useContext(UserDataContext);
     const [loading, setLoading] = React.useState<boolean>(false);
     const router = useRouter();
 
@@ -82,8 +94,8 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
     /**
      *
      * */
-    // Hook to check if user exists and has completed onboarding
-    React.useEffect(() => {
+    // Hook checks if user exists and has completed onboarding
+    useEffect(() => {
         // Check if user has set up account and completed onboarding
         async function onboardChecker() {
             console.log('Checking onboarding status...')
@@ -109,7 +121,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
 
 
     // Get the session when the component mounts.
-    React.useEffect(() => {
+    useEffect(() => {
 
         const getSessionData = async () => {
             const { data: { session }, error } = await supabase.auth.getSession();

@@ -190,13 +190,14 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                         <Flex align="center" gap={"4"}>
                             <HoverCard.Root>
                                 <HoverCard.Trigger>
+                                <Link href={`/${userId}`}>
                                     <Avatar
-                                        radius={"large"}
-                                        size = "5"
+                                        radius="large"
+                                        size="5"
                                         src={user.user_metadata.avatar_url}
                                         fallback={user.user_metadata.custom_claims.global_name.charAt(0)}
                                     />
-
+                                </Link>
                                 </HoverCard.Trigger>
 
                                 <HoverCard.Content maxWidth="300px">

@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // Verify the user's token
     const authHeader = req.headers.get('Authorization');
     const token = authHeader?.split(' ')[1];
-    await verifyToken(token, res);
+    await verifyToken(token);
 
     const headersList = headers();
   try {

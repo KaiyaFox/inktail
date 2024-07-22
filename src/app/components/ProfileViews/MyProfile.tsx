@@ -4,6 +4,7 @@ import react from "react";
 import {Box, Text, Badge} from "@radix-ui/themes";
 import CreateSprintDialog from "../commission/Create/CommissionSprint";
 import React from "react";
+import CreateNew from "../commission/CreateNew";
 
 interface UserProfile {
     is_admin: boolean;
@@ -40,13 +41,14 @@ const ManageProfile: React.FC <UserProfile> = ({is_admin, username, email, prono
                     top: 0,
                     left: 0,
                     right: 0,
-                    bottom: 0,
+                    bottom: -100,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
                     padding: '20px',
+                    animation: 'fadeIn 3.0s',
                 }}
             >
                 <>
@@ -58,10 +60,14 @@ const ManageProfile: React.FC <UserProfile> = ({is_admin, username, email, prono
                     <Badge color={'gray'}>Admin{is_admin}</Badge>
                     <Badge>Creator{creator}</Badge>
                     {/* Add more fields as needed */}
+
                     <CreateSprintDialog />
+
                 </>
             </Box>
         </Box>
+
+
 
 
     );

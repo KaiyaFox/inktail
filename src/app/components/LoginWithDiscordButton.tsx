@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import UserDataContext from "../../contexts/userDataContext";
 import Image from 'next/image';
 import { middleware } from '../../middleware';
-import {Button, Avatar, Flex, Skeleton, Box, HoverCard, Link, Heading, Text, Badge, Spinner} from "@radix-ui/themes";
+import {Button, Avatar, Flex, Skeleton, Box, HoverCard, Link, Heading, Text, Badge, Spinner, Switch} from "@radix-ui/themes";
 import { ExitIcon } from '@radix-ui/react-icons';
 import {User} from "@supabase/auth-helpers-nextjs";
 import {boolean} from "yup";
@@ -232,8 +232,10 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                                                     <Button size={"2"} color={"red"} onClick={handleLogout}>
                                                         Logout <ExitIcon />
                                                     </Button>
-
                                                 </Box>
+
+                                                    <Text size={"2"}>Filter NSFW <Switch size={"3"} radius={"full"}  />
+                                                    </Text>
 
                                             </Text>
                                         </Box>

@@ -7,6 +7,7 @@ import CreateSprintDialog from "../../components/commission/Create/CommissionSpr
 import CreateNewCommission from "../../components/commission/CreateNew";
 import {type} from "typedoc/dist/lib/output/themes/default/partials/type";
 import ManageProfile from "../../components/ProfileViews/MyProfile";
+import CreateNew from "../../components/commission/CreateNew";
 
 
 interface UserProfile {

@@ -3,11 +3,11 @@
 // Handle the form submission for setting up a new account
 // This component will guide the user through the onboarding process to create a new user account.
 
-// TODO: Modularize the onboarding steps into separate components.
-
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
+import { useContext } from 'react';
+import UserDataContext from '../../contexts/userDataContext';
 import { useRouter } from "next/navigation";
 import {
     Button,
@@ -31,6 +31,24 @@ import * as Yup from "yup";
 import { useFormik, FieldArray, FieldArrayRenderProps} from "formik";
 import {CreateNewAccount} from "../../app/utils/Helpers/accountHelper";
 
+// Debounce the form validation to prevent spamming the server
+function useDebounce(value: string, delay: number): string {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
+
+}
+
 // Form validation schema for input fields
 // TODO: Replace all traditional react forms with Formik forms.
 let validationSchema = Yup.object().shape({
@@ -39,19 +57,19 @@ let validationSchema = Yup.object().shape({
         .required('Username is required')
         .min(3, 'Username must be at least 3 characters')
         .max(20, 'Username must be less than 20 characters')
-        .matches(/^[a-zA-Z0-9_]*$/, 'Username must contain only letters, numbers, and underscores')
-        .test('unique-username', 'This username is already taken', async (value) => {
-            if (!value) return false;
-            try {
-                // Check if the username is unique
-                const response = await fetch(`/api/user/username/${value}`);
-                const data = await response.json();
-                return data.isUnique;
-            } catch (error) {
-                console.error('Failed to check username:', error);
-                return false;
-            }
-        }),
+        .matches(/^[a-zA-Z0-9_]*$/, 'Username must contain only letters, numbers, and underscores'),
+        // .test('unique-username', 'This username is already taken', async (value) => {
+        //     if (!value) return false;
+        //     try {
+        //         // Check if the username is unique
+        //         const response = await fetch(`/api/user/username/${value}`);
+        //         const data = await response.json();
+        //         return data.isUnique;
+        //     } catch (error) {
+        //         console.error('Failed to check username:', error);
+        //         return false;
+        //     }
+        // }),
     // Media type validation
     media_type: Yup.string()
         .oneOf(['digital', 'traditional', 'textile', 'model'])
@@ -202,14 +220,22 @@ const OnboardingPage = () => {
 
 // Step 1: Set a username and profile information
 const CreateUserName = ({onNext, formik, setDisableNext, disableNext}) => {
+    // Debouncer for the username input field
+    const debouncedUsername =  useDebounce(formik.values.username, 6000);
+
     // Check for errors in formik and disable the next button if there are errors
     useEffect(() => {
+        if (debouncedUsername) {
+            console.log('Waiting for debounce:', debouncedUsername);
+            // TODO: Fix the debouncer
+
+        }
         if (formik.errors.username) {
             setDisableNext(true)
         } else {
             setDisableNext(false)
         }
-    }, [formik.errors.username, setDisableNext]);
+    }, [setDisableNext, debouncedUsername]);
 
     return (
         <div>
@@ -441,11 +467,16 @@ const TermsAndConditions = ({onNext, onback, formik}) => {
 // Step 5: Finalizing account.
 // Run any final setup tasks and creates the account by sending the form data to the api/user/create endpoint.
 const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferences, tosAgree, formikValues}) => {
+
+    const { session, userId } = useContext(UserDataContext);
+
+
     // Convert to formData and send to the server
     const finalizeAccount = async () => {
         // Gather the state variables into a formData object
         const formData = {
             ...formikValues,
+            userId,
         };
         // Send the formData object to the server
         try {
@@ -457,11 +488,13 @@ const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferenc
             console.error('Failed to create user:', error);
         }
     };
-
+    // Todo: Add provider name to the message.
+    let provider = session.provider;
     return (
         <div>
             <Heading>Finalize account setup</Heading>
-            <Text>Does all this info look correct?</Text>
+            <Text>You are almost done setting up your account. You are using InkTail with your {provider} account.</Text>
+            <Text>Here is a breakdown of what you entered in for your profile details and settings.</Text>
             <Text>Username: {username}</Text>
             <Text>Content you create: {commissionPreferences}</Text>
             <Text>Gender: {gender}</Text>

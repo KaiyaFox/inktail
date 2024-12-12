@@ -1,8 +1,8 @@
 "use client"
-import {useEffect, useContext, useState} from "react";
+import React, {useEffect, useContext, useState} from "react";
 import {useRouter, useSearchParams, usePathname} from "next/navigation";
 import UserDataContext from "../../../contexts/userDataContext";
-import {Box, Heading, Skeleton, Text, Section} from "@radix-ui/themes";
+import {Box, Heading, Skeleton, Text, Section, Button, Container, Link} from "@radix-ui/themes";
 import CreateSprintDialog from "../../components/commission/Create/CommissionSprint";
 import CreateNewCommission from "../../components/commission/CreateNew";
 import {type} from "typedoc/dist/lib/output/themes/default/partials/type";
@@ -26,7 +26,7 @@ const UserPage = () => {
 
     // Local state for the user profile
     // TODO: Ensure profile data contains all relevant user data to be displayed
-    const [ profile, setProfile ] = useState<UserProfile | null>(null);
+    const [profile, setProfile ] = useState<UserProfile | null>(null);
     const [notFound, setNotFound] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [owner, setOwner] = useState<boolean>(false);
@@ -57,21 +57,22 @@ const UserPage = () => {
                     }
                     const data = await response.json();
                     // Update the user context with the fetched data
+                    console.log(data)
                     setProfile(data);
                     console.log('Fetched data:', data);
-                    // Check if the user accessing the page the same as the user in the profile
-                    if (data.id === userId) {
+                    // Check if the user accessing the page the same as the user in the profile using session data
+                    if (session.user.id === userId) {
                         setOwner(true);
                     } else {
                         setOwner(false);
                     }
                     // TODO: Fix state variable of owner not setting correctly
-                    console.log(typeof data.id)
-                    console.log(typeof userId)
+                    console.log("ID from path: ", userId)
                     console.log(data.id)
-                    console.log('Owner:', owner);
+                    console.log('Viewer is Owner:', owner);
 
                 } catch (error) {
+                    setNotFound(true);
                     console.error('There was a problem with fetching user profile:', error);
                 }
 
@@ -128,7 +129,40 @@ const UserPage = () => {
             </Box>
         ) : (
             <Box>
-                <Skeleton />
+                <Box>
+                    {notFound ? (
+                        <>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '100vh'
+                            }}>
+                                <Box>
+                                    <Container size={"1"} align={"center"}>
+                                        <Heading color={'purple'} align={'center'} size={'8'}>404: User Not
+                                            Found</Heading>
+                                        <Text align={'center'} size={'4'}>Uh-oh, user {userId} was not found</Text>
+                                    </Container>
+                                    <Box align={'center'} mb={'4'} mt={'4'}>
+                                        <Link>
+                                            <Button radius={"none"} size={"4"}>Return Home</Button>
+                                        </Link>
+                                    </Box>
+                                </Box>
+                            </div>
+                        </>
+
+                    ) : (
+                        <>
+                            <Skeleton/>
+                            <Text align={'center'}>Loading...</Text>
+
+                        </>
+
+
+                    )}
+                </Box>
             </Box>
 
         )

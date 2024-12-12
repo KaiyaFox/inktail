@@ -6,6 +6,9 @@ import CreateNewCommission from './components/commission/CreateNew';
 import {Box, Button, Container, Text, Heading, Separator, Flex} from "@radix-ui/themes";
 import LargeSearchBar from "./components/Search/LargeSearchBar";
 import CreateSprintDialog from "./components/commission/Create/CommissionSprint";
+import AccountSetup from "./components/Onboarding/AccountSetup";
+import Basic from "./components/Onboarding/Form";
+import {NewCharacterDialog} from "./components/Character/CreateCharacterDialog";
 
 const HomePage: React.FC = () => {
   const router = useRouter();
@@ -36,6 +39,10 @@ const HomePage: React.FC = () => {
                   <LargeSearchBar/>
               </Container>
           </Box>
+          <AccountSetup/>
+          <Basic/>
+          <NewCharacterDialog/>
+
 
       </>
 

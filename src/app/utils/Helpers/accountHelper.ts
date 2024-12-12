@@ -4,6 +4,7 @@ import { createClient } from "../supabase/client";
 import {User} from "@supabase/auth-helpers-nextjs";
 import {PostgrestError} from "@supabase/supabase-js";
 import UserDataContext from "../../../contexts/userDataContext";
+import {AlertDialog} from "@radix-ui/themes";
 
 // TODO: Create api endpoint to handle account creation
 const supabase = createClient();
@@ -21,7 +22,7 @@ export const CreateNewAccount = async (formData: any) => {
         });
 
         if (response.ok) {
-            console.log('Account created successfully!', formData, response);
+            console.log('Calling DB API', formData, response);
             return true;
         } else {
             console.error('Failed to create account', formData, response);
@@ -62,7 +63,8 @@ export const createUser = async (userId: string, sessionData: any): Promise <boo
         } else {
             console.log('User not found. Attempting to create user:', userId);
             // console.log('Session data:', sessionData);
-            // Create the user in users table
+
+            // Create a new user in the database
             const { data, error } = await supabase
                 .from('users')
                 .insert([
@@ -95,6 +97,7 @@ export const checkOnboardingStatus = async (userId: string) => {
         const { data, error } = await supabase
             .from('users')
             .select('is_onboarded')
+            .eq('id', userId)
             .single();
         if (error) {
             console.error('Error fetching onboarding status:', error);

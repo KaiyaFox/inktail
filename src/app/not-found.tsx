@@ -12,20 +12,21 @@ const NotFoundPage = () => {
         router.push('/');
     }
     return (
-
+        // Set the parent container to a flex container that fills the viewport
+        // and centers its children both vertically and horizontally
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
             <Box>
                 <Container size={"1"} align={"center"}>
-            <Heading>404: Page Not Found</Heading>
-            <Text>Sorry, the page you were looking for was not found.</Text>
+                    <Heading color={'purple'} align={'center'} size={'8'}>404: Page Not Found</Heading>
+                    <Text align={'center'} size={'4'}>Uh-oh, the page you were looking for was not found.</Text>
+                </Container>
+                <Box align={'center'}  mb={'4'} mt={'4'}>
                     <Link onClick={handleClick}>
                         <Button radius={"none"} size={"4"}>Return Home</Button>
                     </Link>
-                    {userId && <p>Logged in as: {userId}</p>}
-
-                </Container>
-
-
+                </Box>
             </Box>
+        </div>
     );
 };
 

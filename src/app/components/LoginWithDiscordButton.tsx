@@ -35,10 +35,15 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
         setUserId,
         setEmail,
         setUsername,
-        setAvatarUrl
+        setAvatarUrl,
     } = useContext(UserDataContext);
     const [loading, setLoading] = React.useState<boolean>(false);
     const router = useRouter();
+
+    // Handle Navigation
+    const handleNavigation = (path: string) => {
+        router.push(path)
+    }
 
     const supabase = createClient()
 
@@ -190,7 +195,10 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                         <Flex align="center" gap={"4"}>
                             <HoverCard.Root>
                                 <HoverCard.Trigger>
-                                <Link href={`/${userId}`}>
+
+                                <Link
+                                    onClick={() => handleNavigation(`/user/${userId}`)}
+                                      style={{ cursor: 'pointer'}}>
                                     <Avatar
                                         radius="large"
                                         size="5"
@@ -215,7 +223,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                                             </Heading>
                                             {}
                                             <Badge variant="surface" radius="full" color="purple">
-                                                Creator
+                                                {}
                                             </Badge>
                                             <Text as="div" size="2" color="gray" mb="2">
                                                 {user.email}

@@ -4,17 +4,20 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse, NextRequest } from "next/server";
 import { check, validationResult } from "express-validator";
 // Create a new Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
-);
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
 
 // User interface
 interface User {
-  email: string;
-  password: string;
+  email?: string;
+  pronouns?: string;
+  gender?: string;
+  password?: string;
+  bio?: string;
+  onboarding?: boolean;
   username: string;
+  creator?: boolean;
   role?: string;
+  nsfwFilter?: true;
 }
 
 const validateUser = async (req: NextRequest) => {
@@ -42,22 +45,49 @@ export async function POST(req: NextRequest) {
     console.log("Request Body:", req.body);
     const body = await req.json();
     console.log("Request Body:", body);
+
+    // Extract userId from the request body
+    const userId = body.userId;
+    console.log("User ID in ROUTE:", userId);
+
+    // Check if the user already exists
+    const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', userId)
+        .single();
+
+    if (checkError) {
+      console.error("Error checking user existence:", checkError);
+      return NextResponse.json({ message: "Error checking user existence" });
+    }
+
+    if (!existingUser) {
+      return NextResponse.json({ message: "User does not exist" });
+    }
+
     // Create a new user object
     const newUser: User = {
-      email: body.email,
-      password: body.password,
-      username: body.username,
-      role: body.role,
-    };
-    // Validate the user
-    await validateUser(req); // This calls the validateUser function
 
-    // Create a new user
-    const { data, error } = await supabase.auth.signUp({
-      email: newUser.email,
-      password: newUser.password,
-      // displayname: newUser.displayname,
-    });
+      username: body.username,
+      pronouns: body.pronouns,
+      gender: body.gender,
+      bio: body.bio,
+      creator: body.creator,
+      nsfwFilter: body.nsfwFilter,
+      onboarding: body.onboarding,
+
+    };
+
+    // Validate the user
+    await validateUser(req);
+
+    // Update user's name in the users table in the database
+    const { data, error } = await supabase
+        .from('users')
+        .update(newUser)
+        .eq('id', userId);
+
     return NextResponse.json({ message: data, error });
   } catch (error) {
     console.error("Error in POST request", error);

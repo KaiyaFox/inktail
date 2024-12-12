@@ -21,6 +21,7 @@ const UserProvider = ({children}) => {
     const [mature, setMature] = react.useState<boolean>(false);
     const [userProfile, setUserProfile] = react.useState(
         {
+            userSession: '',
             userId: '',
             username: '',
             email: '',
@@ -53,7 +54,8 @@ const UserProvider = ({children}) => {
                 provider, setProvider,
                 mature, setMature,
                 userProfile, setUserProfile,
-                username, setUsername
+                username, setUsername,
+                // userProfile, setUserProfile,
 
             }
                 }

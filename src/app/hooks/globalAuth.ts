@@ -30,9 +30,9 @@ export function useAuth(router: NextRouter) {
         // Check if user exists in database
         try {
           const { data: user, error: fetchUserError } = await supabase
-            .from("users")
-            .select()
-            .eq("id", session.user.id);
+              .from("users")
+              .select()
+              .eq("id", session.user.id);
           if (fetchUserError) {
             console.error("Error fetching user from db:", fetchUserError);
             return;

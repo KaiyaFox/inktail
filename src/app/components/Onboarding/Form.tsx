@@ -1,13 +1,18 @@
 import React from 'react';
 import { Formik } from 'formik';
 
+interface FormValues {
+    email: string;
+    password: string;
+}
+
 const Basic = () => (
     <div>
         <h1>Anywhere in your app!</h1>
-        <Formik
+        <Formik<FormValues>
             initialValues={{ email: '', password: '' }}
             validate={values => {
-                const errors = {};
+                const errors: Partial<FormValues> = {};
                 if (!values.email) {
                     errors.email = 'Required';
                 } else if (
@@ -32,7 +37,6 @@ const Basic = () => (
                   handleBlur,
                   handleSubmit,
                   isSubmitting,
-                  /* and other goodies */
               }) => (
                 <form onSubmit={handleSubmit}>
                     <input

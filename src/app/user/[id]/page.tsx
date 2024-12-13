@@ -5,7 +5,6 @@ import UserDataContext from "../../../contexts/userDataContext";
 import {Box, Heading, Skeleton, Text, Section, Button, Container, Link} from "@radix-ui/themes";
 import CreateSprintDialog from "../../components/commission/Create/CommissionSprint";
 import CreateNewCommission from "../../components/commission/CreateNew";
-import {type} from "typedoc/dist/lib/output/themes/default/partials/type";
 import ManageProfile from "../../components/ProfileViews/MyProfile";
 import CreateNew from "../../components/commission/CreateNew";
 
@@ -144,7 +143,7 @@ const UserPage = () => {
                                             Found</Heading>
                                         <Text align={'center'} size={'4'}>Uh-oh, user {userId} was not found</Text>
                                     </Container>
-                                    <Box align={'center'} mb={'4'} mt={'4'}>
+                                    <Box style={{ textAlign: 'center' }} mb={'4'} mt={'4'}>
                                         <Link>
                                             <Button radius={"none"} size={"4"}>Return Home</Button>
                                         </Link>

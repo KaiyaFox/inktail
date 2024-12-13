@@ -19,6 +19,11 @@ interface Tag {
 export async function POST(req: NextRequest, res: NextResponse) {
     const authHeader = req.headers.get('Authorization');
     const token = authHeader?.split(' ')[1];
+
+    if (!token) {
+        return NextResponse.json({ error: "Authorization token is missing" }, { status: 401 });
+    }
+
     // Create a supabase client with the token provided
     const supabase = createClientWithToken(token);
 
@@ -27,11 +32,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await verifyToken(token);
     } catch (error) {
         console.error(error);
-        return NextResponse.json({error: error.message}, {status: error.message === "No token provided" ? 401 : 403});
+        const errorMessage = (error as Error).message;
+        return NextResponse.json({error: errorMessage}, {status: errorMessage === "No token provided" ? 401 : 403});
     }
 
     try {
-
         // Read the request body and parse the tag name
         const requestBody = await req.text();
         console.log('request body: ', requestBody)

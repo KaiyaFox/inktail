@@ -87,6 +87,7 @@ interface OnboardingProps {
     email: string;
     userId: string;
     provider: string;
+    gender: string;
 }
 
 
@@ -219,21 +220,29 @@ const OnboardingPage = () => {
 // Onboarding steps
 
 // Step 1: Set a username and profile information
-const CreateUserName = ({onNext, formik, setDisableNext, disableNext}) => {
+interface CreateUserNameProps {
+    onNext: () => void;
+    formik: any;
+    setDisableNext: React.Dispatch<React.SetStateAction<boolean>>;
+    disableNext: boolean;
+    gender: string;
+    setGender: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const CreateUserName: React.FC<CreateUserNameProps> = ({ onNext, formik, setDisableNext, disableNext, gender, setGender }) => {
     // Debouncer for the username input field
-    const debouncedUsername =  useDebounce(formik.values.username, 6000);
+    const debouncedUsername = useDebounce(formik.values.username, 6000);
 
     // Check for errors in formik and disable the next button if there are errors
     useEffect(() => {
         if (debouncedUsername) {
             console.log('Waiting for debounce:', debouncedUsername);
             // TODO: Fix the debouncer
-
         }
         if (formik.errors.username) {
-            setDisableNext(true)
+            setDisableNext(true);
         } else {
-            setDisableNext(false)
+            setDisableNext(false);
         }
     }, [setDisableNext, debouncedUsername]);
 
@@ -259,10 +268,10 @@ const CreateUserName = ({onNext, formik, setDisableNext, disableNext}) => {
                 <p>Gender</p>
                 <Select.Root
                     name="gender"
-                    onValueChange={(value) => formik.handleChange({target: {name: 'gender', value}})}
-                    value={formik.values.gender}>
-
-                    <Select.Trigger/>
+                    onValueChange={(value) => formik.handleChange({ target: { name: 'gender', value } })}
+                    value={formik.values.gender}
+                >
+                    <Select.Trigger />
                     <Select.Content>
                         <Select.Group>
                             <Select.Label>Gender</Select.Label>
@@ -272,12 +281,10 @@ const CreateUserName = ({onNext, formik, setDisableNext, disableNext}) => {
                         </Select.Group>
                     </Select.Content>
                 </Select.Root>
-                <Flex direction="column" gap="3">
-
-                </Flex>
-                <Box mt={'1'} style={{display: 'flex', alignItems: 'centers', justifyContent: 'right'}}>
+                <Flex direction="column" gap="3"></Flex>
+                <Box mt={'1'} style={{ display: 'flex', alignItems: 'centers', justifyContent: 'right' }}>
                     <Button type="submit" onClick={onNext} disabled={disableNext}>
-                        Next <ArrowRightIcon/>
+                        Next <ArrowRightIcon />
                     </Button>
                 </Box>
             </form>

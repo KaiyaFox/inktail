@@ -173,45 +173,53 @@ export const NewCharacterDialog = () => {
                                                         </Badge>
                                                     </DataList.Value>
                                                 </DataList.Item>
-                                                <DataList.Item style={{ display: 'flex', alignItems: 'center' }}>
+
+                                                <DataList.Item style={{display: 'flex', alignItems: 'center'}}>
                                                     <DataList.Label minWidth="88px">Gender</DataList.Label>
-                                                    <Select.Root
-                                                        size="3"
-                                                        defaultValue="none"
-                                                        value={gender}
-                                                        onValueChange={(value) => setGender(value)}
-                                                        style={{ flex: 1 }}
-                                                    >
-                                                        <Select.Trigger />
-                                                        <Select.Content>
-                                                            <Select.Group>
-                                                                <Select.Item value="none" disabled>Gender</Select.Item>
-                                                                <Select.Item value="Female">Female ♀</Select.Item>
-                                                                <Select.Item value="Male">Male ♂</Select.Item>
-                                                                <Select.Item value="Non-Binary">Non-Binary ⚧</Select.Item>
-                                                            </Select.Group>
-                                                        </Select.Content>
-                                                    </Select.Root>
+                                                    <div style={{flex: 1}}>
+                                                        <Select.Root
+                                                            size="3"
+                                                            defaultValue="none"
+                                                            value={gender}
+                                                            onValueChange={(value) => setGender(value)}
+                                                        >
+                                                            <Select.Trigger/>
+                                                            <Select.Content>
+                                                                <Select.Group>
+                                                                    <Select.Item value="none"
+                                                                                 disabled>Gender</Select.Item>
+                                                                    <Select.Item value="Female">Female ♀</Select.Item>
+                                                                    <Select.Item value="Male">Male ♂</Select.Item>
+                                                                    <Select.Item value="Non-Binary">Non-Binary
+                                                                        ⚧</Select.Item>
+                                                                </Select.Group>
+                                                            </Select.Content>
+                                                        </Select.Root>
+                                                    </div>
+
                                                     <DataList.Label minWidth="88px">Pronouns</DataList.Label>
-                                                    <Select.Root
-                                                        size="3"
-                                                        defaultValue="none"
-                                                        value={gender}
-                                                        onValueChange={(value) => setGender(value)}
-                                                        style={{ flex: 1 }}
-                                                    >
-                                                        <Select.Trigger />
-                                                        <Select.Content>
-                                                            <Select.Group>
-                                                                <Select.Item value="none" disabled>Pronouns</Select.Item>
-                                                                <Select.Item value="Female">She/Her</Select.Item>
-                                                                <Select.Item value="Male">He/Him</Select.Item>
-                                                                <Select.Item value="Non-Binary">They/Them</Select.Item>
-                                                            </Select.Group>
-                                                        </Select.Content>
-                                                    </Select.Root>
+                                                    <div style={{flex: 1}}>
+                                                        <Select.Root
+                                                            size="3"
+                                                            defaultValue="none"
+                                                            value={gender}
+                                                            onValueChange={(value) => setGender(value)}
+                                                        >
+                                                            <Select.Trigger/>
+                                                            <Select.Content>
+                                                                <Select.Group>
+                                                                    <Select.Item value="none"
+                                                                                 disabled>Pronouns</Select.Item>
+                                                                    <Select.Item value="Female">She/Her</Select.Item>
+                                                                    <Select.Item value="Male">He/Him</Select.Item>
+                                                                    <Select.Item
+                                                                        value="Non-Binary">They/Them</Select.Item>
+                                                                </Select.Group>
+                                                            </Select.Content>
+                                                        </Select.Root>
+                                                    </div>
                                                 </DataList.Item>
-                                                <DataList.Item style={{ display: 'flex', alignItems: 'center' }}>
+                                                <DataList.Item style={{display: 'flex', alignItems: 'center'}}>
                                                     <DataList.Label minWidth="88px">About</DataList.Label>
                                                     <TextArea
                                                         resize={"vertical"}
@@ -348,7 +356,7 @@ export const NewCharacterDialog = () => {
                                                 color={primaryColor}
                                                 onChangeComplete={(color) => setPrimaryColor(color.hex)}
                                                 disableAlpha
-                                                style={{ flex: 1 }}
+
                                             />
                                         </DataList.Item>
                                     </DataList.Item>

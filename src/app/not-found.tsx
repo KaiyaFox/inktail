@@ -20,7 +20,7 @@ const NotFoundPage = () => {
                     <Heading color={'purple'} align={'center'} size={'8'}>404: Page Not Found</Heading>
                     <Text align={'center'} size={'4'}>Uh-oh, the page you were looking for was not found.</Text>
                 </Container>
-                <Box align={'center'}  mb={'4'} mt={'4'}>
+                <Box style={{ textAlign: 'center' }} mb={'4'} mt={'4'}>
                     <Link onClick={handleClick}>
                         <Button radius={"none"} size={"4"}>Return Home</Button>
                     </Link>

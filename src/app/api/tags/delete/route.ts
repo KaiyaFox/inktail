@@ -15,7 +15,7 @@ interface Tag {
 
 export async function POST(req: NextRequest, res: NextResponse) {
     const authHeader = req.headers.get('Authorization');
-    const token = authHeader?.split(' ')[1];
+    const token = authHeader?.split(' ')[1] || null;
 
     try {
         await verifyToken(token);

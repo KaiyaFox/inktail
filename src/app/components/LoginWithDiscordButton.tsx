@@ -107,6 +107,8 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
             const status = await createUser(userId, session)
             if (status === false) {
                 console.log('User has not completed onboarding')
+                // Show toast notification
+
                 setIsOnboarded(status)
                 router.push('/setup')
             } else if (status === null) {

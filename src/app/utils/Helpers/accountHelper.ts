@@ -1,5 +1,6 @@
-// Helper functions that assist in user account data manipulation
-
+/**
+ * This module contains helper functions for user account management.
+ */
 import { createClient } from "../supabase/client";
 import {User} from "@supabase/auth-helpers-nextjs";
 import {PostgrestError} from "@supabase/supabase-js";
@@ -9,8 +10,16 @@ import {AlertDialog} from "@radix-ui/themes";
 // TODO: Create api endpoint to handle account creation
 const supabase = createClient();
 
-
-export const CreateNewAccount = async (formData: any) => {
+/**
+ * The CreateNewAccount fn creates a new user account in the database. Simply pass it form data It calls the backend API to create a new user and then
+ * returns a boolean.
+ * @param formData
+ * @type {object} - The form data object containing the user's email, password, and other details.
+ * @example CreateNewAccount(formData) // returns true or false
+ * @returns {boolean} - Returns true if the account was created successfully, otherwise false.
+ *
+ */
+export const CreateNewAccount: object = async (formData: any) => {
     try {
         console.log('Calling backend to create account...');
         const response = await fetch('/api/user/create', {
@@ -55,8 +64,8 @@ export const createUser = async (userId: string, sessionData: any): Promise <boo
         console.log('Verifying user exists in database:', userId);
         const { data, error } = await supabase
             .from('users')
-            .select('id')
-            .eq('id', userId)
+            .select('userId')
+            .eq('userId', userId)
             .single();
         if (!error) {
             console.log('User exists');
@@ -69,7 +78,7 @@ export const createUser = async (userId: string, sessionData: any): Promise <boo
                 .from('users')
                 .insert([
                     {
-                        id: userId,
+                        userId: userId,
                         email: sessionData.user.email,
                     }
 
@@ -96,14 +105,14 @@ export const checkOnboardingStatus = async (userId: string) => {
         console.log('Checking onboarding status...');
         const { data, error } = await supabase
             .from('users')
-            .select('is_onboarded')
-            .eq('id', userId)
+            .select('onboarding')
+            .eq('userId', userId)
             .single();
         if (error) {
             console.error('Error fetching onboarding status:', error);
             return false;
-        } else if (data.is_onboarded === true) {
-            console.log('Onboarding status:', data.is_onboarded);
+        } else if (data.onboarding === true) {
+            console.log('Onboarding status:', data.onboarding);
             return true;
         } else {
             console.error('User onboarding status not found:', userId);
@@ -146,7 +155,7 @@ export const testConnection = async () => {
     try {
         const { data, error } = await supabase
             .from('users')
-            .select('id');
+            .select('userId');
         if (error) {
             console.error('Error fetching user data:', error.message);
             return false;

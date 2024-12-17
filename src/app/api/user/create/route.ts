@@ -7,6 +7,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse, NextRequest } from "next/server";
 import { check, validationResult } from "express-validator";
+import authMiddleware from "../../middleware/authMiddleware";
 
 
 // Create a new Supabase client
@@ -52,6 +53,13 @@ const validateUser = async (req: NextRequest) => {
 // Create a new user
 
 export async function POST(req: NextRequest) {
+
+  // Middleware to verify the session token
+  const middlewareResponse = await authMiddleware(req);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse; // Stop processing if middleware fails
+  }
+
   try {
     // Log the entire request body received
     console.log("Request Body:", req.body);
@@ -67,7 +75,7 @@ export async function POST(req: NextRequest) {
         .from('users')
         .select('userId')
         .eq('userId', userId)
-        .single();
+        //.single();
 
     if (checkError) {
       console.error("Error checking user existence:", checkError);
@@ -100,7 +108,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase
         .from('users')
         .update(newUser)
-        .eq('userId', userId);
+        .eq('userId', userId)
 
     if (error) {
       console.error("Error updating user:", error);

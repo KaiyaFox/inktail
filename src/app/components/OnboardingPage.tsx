@@ -228,7 +228,7 @@ interface CreateUserNameProps {
     gender: string;
     setGender: React.Dispatch<React.SetStateAction<string>>;
 }
-
+// Todo: Fix username checker. Its buggy when debouncer is used.
 const CreateUserName: React.FC<CreateUserNameProps> = ({ onNext, formik, setDisableNext, disableNext, gender, setGender }) => {
     // Debouncer for the username input field
     const [usernameAvailable, setUsernameAvailable] = useState<boolean>(null)
@@ -242,15 +242,15 @@ const CreateUserName: React.FC<CreateUserNameProps> = ({ onNext, formik, setDisa
             const fetchData = async () => {
                 try {
                     const response = await fetch(`/api/user/search?username=${debouncedUsername}`);
-                    const data = await response.json();
-                    console.log('Username data:', data);
+                    const user = await response.json();
+                    console.log('Username data:', user);
 
-                    if (data.found === true) {
+                    if (user.found === true) {
                         formik.setFieldError('username', 'This username is already taken');
-                        setUsernameAvailable(data.isUnique);
+                        setUsernameAvailable(false);
 
-                    } else {
-                        formik.setSuccessField('username', 'Username Is available!');
+                    } else if (user.found === false) {
+                        setUsernameAvailable(true)
                     }
                 } catch (error) {
                     console.error('Failed to check username:', error);

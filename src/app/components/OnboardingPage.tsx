@@ -231,20 +231,45 @@ interface CreateUserNameProps {
 
 const CreateUserName: React.FC<CreateUserNameProps> = ({ onNext, formik, setDisableNext, disableNext, gender, setGender }) => {
     // Debouncer for the username input field
-    const debouncedUsername = useDebounce(formik.values.username, 6000);
+    const [usernameAvailable, setUsernameAvailable] = useState<boolean>(null)
+    const debouncedUsername = useDebounce(formik.values.username, 3000);
 
     // Check for errors in formik and disable the next button if there are errors
     useEffect(() => {
+        // Check if the username is available
+        if (debouncedUsername) {
+            console.log('Checking username:', debouncedUsername);
+            const fetchData = async () => {
+                try {
+                    const response = await fetch(`/api/user/search?username=${debouncedUsername}`);
+                    const data = await response.json();
+                    console.log('Username data:', data);
+
+                    if (data.found === true) {
+                        formik.setFieldError('username', 'This username is already taken');
+                        setUsernameAvailable(data.isUnique);
+
+                    } else {
+                        formik.setSuccessField('username', 'Username Is available!');
+                    }
+                } catch (error) {
+                    console.error('Failed to check username:', error);
+                    setUsernameAvailable(false);
+                }
+            } // Call the fetch function
+            fetchData().then(r => console.log('Username check complete:', r));
+        }
+
         if (debouncedUsername) {
             console.log('Waiting for debounce:', debouncedUsername);
             // TODO: Fix the debouncer
         }
-        if (formik.errors.username) {
+        if (formik.errors.username || !formik.values.username) {
             setDisableNext(true);
         } else {
             setDisableNext(false);
         }
-    }, [setDisableNext, debouncedUsername]);
+    }, [setDisableNext, debouncedUsername, formik.errors.username, formik.values.username]);
 
     return (
         <div>
@@ -264,7 +289,9 @@ const CreateUserName: React.FC<CreateUserNameProps> = ({ onNext, formik, setDisa
                     value={formik.values.username}
                     onChange={formik.handleChange}
                 />
+                <div>
                 {formik.errors.username ? <Text color={"red"} size={"5"}> 😔 {formik.errors.username}</Text> : null}
+                </div>
                 <p>Gender</p>
                 <Select.Root
                     name="gender"

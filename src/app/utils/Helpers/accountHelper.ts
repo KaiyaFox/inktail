@@ -19,7 +19,7 @@ const supabase = createClient();
  * @returns {boolean} - Returns true if the account was created successfully, otherwise false.
  *
  */
-export const CreateNewAccount: object = async (formData: any) => {
+export async function CreateNewAccount (formData: any): Promise<boolean>{
     try {
         console.log('Calling backend to create account...');
         const response = await fetch('/api/user/create', {

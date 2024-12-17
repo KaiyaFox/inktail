@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         const { data, error } = await supabase
             .from('users')
             .select('*')
-            .eq('id', userId)
+            .eq('userId', userId)
             .single();
         if (error) {
             console.error('Error getting profile:', error);

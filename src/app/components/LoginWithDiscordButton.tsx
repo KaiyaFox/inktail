@@ -151,7 +151,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
 
                 console.log('Access token:', token);
             } else {
-                console.log('No active user session');
+                console.error('No logged in user found');
             }
             // Listen for changes to the auth state to update the session.
             const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -232,12 +232,12 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                                             </Text>
                                             <Text as="div" size="1">
                                                 <Box>
-                                                    <Button size={"2"} color={"purple"}>View Profile</Button>
+                                                    <Button size={"2"} color={"purple"} onClick={() => handleNavigation(`/user/${userId}`)}>View Profile</Button>
                                                     <Box>
                                                         <Button mb={'3'} size={"2"} color={"purple"}>Favourites</Button>
                                                     </Box>
                                                     <Box>
-                                                        <Button mb={'3'} size={"2"} color={"purple"}>Settings</Button>
+                                                        <Button mb={'3'} size={"2"} color={"purple"} onClick={() => handleNavigation('/settings')}>Settings</Button>
 
                                                     </Box>
                                                     <Button size={"2"} color={"red"} onClick={handleLogout}>

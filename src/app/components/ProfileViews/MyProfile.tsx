@@ -9,6 +9,7 @@ import {NewCharacterDialog} from "../Character/CreateCharacterDialog";
 
 interface UserProfile {
     is_admin: boolean;
+    bio: string;
     username: string;
     email: string;
     pronouns: string;
@@ -21,7 +22,7 @@ interface UserProfile {
  * This component is the view for the users profile if the user is viewing their own profile.
  * It displays the users information and allows them to edit it.
  */
-const ManageProfile: React.FC <UserProfile> = ({is_admin, username, email, pronouns, gender, creator}) => {
+const ManageProfile: React.FC <UserProfile> = ({is_admin, bio, username, email, pronouns, gender, creator}) => {
     return (
         <Box
             py="9"
@@ -55,7 +56,7 @@ const ManageProfile: React.FC <UserProfile> = ({is_admin, username, email, prono
                 <>
                     <Text style={{ color: 'white', fontSize: '24px' }}>{username}</Text>
                     <Blockquote>
-                        Hello World, welcome to my profile. I like foxes and cute things.
+                        {bio}
                     </Blockquote>
                     <Text style={{ color: 'white', fontSize: '18px' }}>{email}</Text>
                     <Text style={{ color: 'white', fontSize: '16px' }}>Pronouns: {pronouns}</Text>
@@ -63,7 +64,7 @@ const ManageProfile: React.FC <UserProfile> = ({is_admin, username, email, prono
                     <Text style={{ color: 'white', fontSize: '16px' }}>Creator: {creator}</Text>
                     <Badge color={'gray'}>Admin{is_admin}</Badge>
 
-                    <Badge>Creator{creator}</Badge>
+                    <Badge>{creator}</Badge>
                     {/* Add more fields as needed */}
 
                     <CreateSprintDialog />

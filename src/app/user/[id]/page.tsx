@@ -16,6 +16,7 @@ interface UserProfile {
     pronouns: string;
     gender: string;
     creator: boolean;
+    bio: string;
     // Add any other properties you expect to use
 }
 
@@ -76,7 +77,7 @@ const UserPage = () => {
                 }
 
             };
-            fetchData();
+            fetchData().then(() => setLoading(false));
         }
     }, [session, userId, owner]); // Rerun effect if session or userId changes
     if (owner) {
@@ -118,6 +119,7 @@ const UserPage = () => {
                 >
                     <>
                         <Text style={{ color: 'white', fontSize: '24px' }}>{profile.username}</Text>
+                        <Text style={{ color: 'white', fontSize: '18px' }}>{profile.bio}</Text>
                         <Text style={{ color: 'white', fontSize: '18px' }}>{profile.email}</Text>
                         <Text style={{ color: 'white', fontSize: '16px' }}>Pronouns: {profile.pronouns}</Text>
                         <Text style={{ color: 'white', fontSize: '16px' }}>Gender: {profile.gender}</Text>

@@ -5,9 +5,20 @@ const supabase = createClient();
 
 /**
  * Middleware to verify the session token
- * @param req
- * @returns { token, user } or a NextResponse for error
+ * @param req - Give the incoming request to verify a token from the Authorization header
+ * @returns { token, user } returns the token and user object for further use.
+ * @example
+ *     // Call the middleware
+ *     const middlewareResponse = await authMiddleware(req);
+ *
+ *     // If middleware returns a response (error), return it immediately
+ *     if (middlewareResponse instanceof NextResponse) {
+ *         return middlewareResponse; // Unauthorized or token missing
+ *     }
+ *     // Destructure the validated token and user
+ *     const { token } = middlewareResponse;
  */
+
 export async function authMiddleware(req: NextRequest) {
     const authHeader = req.headers.get("Authorization");
     const token = authHeader?.split(" ")[1];

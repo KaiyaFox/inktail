@@ -24,6 +24,7 @@ interface UserProfile {
  */
 const ManageProfile: React.FC <UserProfile> = ({is_admin, bio, username, email, pronouns, gender, creator}) => {
     return (
+
         <Box
             py="9"
             style={{
@@ -54,7 +55,7 @@ const ManageProfile: React.FC <UserProfile> = ({is_admin, bio, username, email, 
                 }}
             >
                 <>
-                    <Text style={{ color: 'white', fontSize: '24px' }}>{username}</Text>
+                    <Text style={{ color: 'white', fontSize: '48px' }}>{username}</Text>
                     <Blockquote>
                         {bio}
                     </Blockquote>
@@ -73,7 +74,9 @@ const ManageProfile: React.FC <UserProfile> = ({is_admin, bio, username, email, 
 
                 </>
             </Box>
+
         </Box>
+
 
 
 

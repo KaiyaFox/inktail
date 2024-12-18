@@ -8,6 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse, NextRequest } from "next/server";
 import { check, validationResult } from "express-validator";
 import authMiddleware from "../../middleware/authMiddleware";
+import {verifyToken} from "../../helpers/verifyToken";
 
 
 // Create a new Supabase client
@@ -54,11 +55,17 @@ const validateUser = async (req: NextRequest) => {
 
 export async function POST(req: NextRequest) {
 
-  // Middleware to verify the session token
+  // Call the middleware
   const middlewareResponse = await authMiddleware(req);
-  if (middlewareResponse.status !== 200) {
-    return middlewareResponse; // Stop processing if middleware fails
+  // If middleware returns a response (error), return it immediately
+  if (middlewareResponse instanceof NextResponse) {
+    return middlewareResponse; // Unauthorized or token missing
   }
+  // Destructure the validated token and user
+  const { token } = middlewareResponse;
+  // Verify the token
+  await verifyToken(token);
+
 
   try {
     // Log the entire request body received

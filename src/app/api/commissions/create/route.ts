@@ -1,29 +1,33 @@
-// API route creates a new commission by inserting a new row into the commissions table in the database
-
 import { NextResponse, NextRequest } from "next/server";
-import { createClient } from "../../../utils/supabase/server";
+import { createClient } from "@supabase/supabase-js";
+import authMiddleware from "../../middleware/authMiddleware";
 import { Commission } from "../../../types/commission";
-import { headers } from "next/headers";
-import { verifyToken} from "../../helpers/verifyToken";
-import { createClientWithToken } from "../../../utils/supabase/client";
 
-// Create a new Supabase client
-const supabase = createClient();
+export async function POST(req: NextRequest) {
+    // Call the middleware
+    const middlewareResponse = await authMiddleware(req);
 
-// Create commission endpoint
-export async function POST(req: NextRequest, res: NextResponse) {
-    // Verify the user's token
-    const authHeader = req.headers.get('Authorization');
-    const token = authHeader?.split(' ')[1];
-
-    if (!token) {
-        return NextResponse.json({ message: "Authorization token is missing" }, { status: 401 });
+    // If middleware returns a response (error), return it immediately
+    if (middlewareResponse instanceof NextResponse) {
+        return middlewareResponse; // Unauthorized or token missing
     }
 
-    // Create a supabase client with the token provided
-    const supabase = createClientWithToken(token);
+    // Destructure the validated token
+    const { token } = middlewareResponse;
 
-    const headersList = headers();
+    // Create a Supabase client using the validated token
+    const supabase = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_KEY!,
+        {
+            global: {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            },
+        }
+    );
+
     try {
         // Log the entire request body received
         console.log("Incoming Request Body:", req.body);

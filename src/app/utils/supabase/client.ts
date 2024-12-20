@@ -1,5 +1,5 @@
+// Used to create a supabase client for server-side rendering.
 import { createBrowserClient } from "@supabase/ssr";
-import {NextResponse} from "next/server";
 
 export function createClient() {
   return createBrowserClient(

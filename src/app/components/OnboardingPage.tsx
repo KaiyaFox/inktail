@@ -262,7 +262,6 @@ const CreateUserName: React.FC<CreateUserNameProps> = ({ onNext, formik, setDisa
 
         if (debouncedUsername) {
             console.log('Waiting for debounce:', debouncedUsername);
-            // TODO: Fix the debouncer
         }
         if (formik.errors.username || !formik.values.username) {
             setDisableNext(true);
@@ -415,7 +414,6 @@ const TermsAndConditions = ({onNext, onback, formik}) => {
     // Set state variables for the terms and conditions
     const [loading, setLoading] = useState(true);
     const [tos, setTos] = useState('');
-    //TODO: Disable next button if tosAgree is false
 
     const tosAgree = formik.values.tosAgree;
 

@@ -1,3 +1,5 @@
+// Used for Email OTP confirmation route. This is currently not implemented in the app.
+
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 

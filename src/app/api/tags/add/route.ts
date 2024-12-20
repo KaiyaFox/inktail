@@ -1,10 +1,9 @@
-import { createClientWithToken } from "../../../utils/supabase/client"
-import { verifyToken } from "../../helpers/verifyToken";
 import { NextResponse, NextRequest } from "next/server";
-import {string} from "yup";
-import {insert} from "formik";
+import authMiddleware from "../../middleware/authMiddleware";
+import { createClient } from "@supabase/supabase-js";
 
 interface Tag {
+    id: number;
     name: string;
     mature: boolean;
     description?: string;
@@ -17,51 +16,58 @@ interface Tag {
  * @constructor
  */
 export async function POST(req: NextRequest, res: NextResponse) {
-    const authHeader = req.headers.get('Authorization');
-    const token = authHeader?.split(' ')[1];
+    // Call the middleware
+    const middlewareResponse = await authMiddleware(req);
 
-    if (!token) {
-        return NextResponse.json({ error: "Authorization token is missing" }, { status: 401 });
+    // If middleware returns a response (error), return it immediately
+    if (middlewareResponse instanceof NextResponse) {
+        return middlewareResponse; // Unauthorized or token missing
     }
 
-    // Create a supabase client with the token provided
-    const supabase = createClientWithToken(token);
+    // Destructure the validated token and user
+    const { token } = middlewareResponse;
 
-    // Verify the token by calling the verifyToken function
-    try {
-        await verifyToken(token);
-    } catch (error) {
-        console.error(error);
-        const errorMessage = (error as Error).message;
-        return NextResponse.json({error: errorMessage}, {status: errorMessage === "No token provided" ? 401 : 403});
-    }
+    // Create a Supabase client using the validated token
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            global: {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            },
+        }
+    );
 
     try {
         // Read the request body and parse the tag name
         const requestBody = await req.text();
-        console.log('request body: ', requestBody)
-        const body = JSON.parse(requestBody)
+        if (!requestBody) {
+            return NextResponse.json({ error: "Request body is empty" }, { status: 400 });
+        }
+
+        const body = JSON.parse(requestBody);
         const tagName = body.tag_name;
         const mature = body.mature;
         const description = body.description;
-        const newTag = {tagName, mature, description}
+        const newTag = { tagName, mature, description };
 
-        // TODO: Cant figure out how to authenticate the user to write to database with RLS policy.
         // Insert new tag into tags table
-        const {data, error} = await supabase
+        const { data, error } = await supabase
             .from('tags')
-            .insert([{tag_name: tagName, mature: mature, description: description}])
-            .select()
+            .insert([{ tag_name: tagName, mature: mature, description: description }])
+            .select();
 
         if (error) {
             console.error('Error inserting tag:', error);
-            return NextResponse.json({error: error}, {status: 400})
+            return NextResponse.json({ error: error }, { status: 400 });
         }
 
-        console.log(data)
-        return NextResponse.json({newTag}, {status: 200})
+        console.log(data);
+        return NextResponse.json({ newTag }, { status: 200 });
     } catch (e) {
-        console.error(e)
-        return NextResponse.json({error: "Internal server error"}, {status: 500})
+        console.error(e);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

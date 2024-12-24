@@ -4,6 +4,7 @@ import CreateSprintDialog from "../commission/Create/CommissionSprint";
 import { NewCharacterDialog } from "../Character/CreateCharacterDialog";
 import { FaEdit } from "react-icons/fa";
 import Dashboard from "./Dashboard";
+import EditProfileButton from "../Buttons/EditProfile";
 
 interface UserProfile {
     is_admin: boolean;
@@ -34,7 +35,7 @@ const ManageProfile: React.FC<UserProfile> = (
                 py="9"
                 className="relative flex justify-center items-center h-[300px] bg-cover bg-center"
                 style={{
-                    backgroundImage: `url(${bannerUrl || "public/inktail_logo_1920x500_fixed.png"})`,
+                    backgroundImage: `url(${bannerUrl || "/inktail.webp"})`,
                 }}
             >
                 {/* Gradient overlay */}
@@ -50,7 +51,13 @@ const ManageProfile: React.FC<UserProfile> = (
                 >
                     {/* Left Section: Profile Info */}
                     <Box className="flex flex-col">
+                        <Box className="align-top justify-center">
+                            <EditProfileButton />
+
+
+                        </Box>
                         <Text className="text-white text-6xl font-mono">{username}</Text>
+
 
                         <Box>
                             <Badge className="mt-0">{creator ? "Creator" : "User"}</Badge>

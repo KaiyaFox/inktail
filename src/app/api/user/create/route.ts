@@ -3,19 +3,9 @@
  *
  */
 
-
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse, NextRequest } from "next/server";
-import { check, validationResult } from "express-validator";
-import authMiddleware from "../../middleware/authMiddleware";
-import {verifyToken} from "../../helpers/verifyToken";
+import withAuth from "../../middleware/withAuth";
 
-
-// Create a new Supabase client
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 // User interface
 interface User {
@@ -34,42 +24,9 @@ interface User {
   tosAgree?: boolean;
 }
 
-const validateUser = async (req: NextRequest) => {
-  // Validate the request body validation chain
-  //   await check("email", "Email is required").isEmail().run(req);
-  //   await check("password", "Password is required").isLength({ min: 6 }).run(req);
-  //   await check("username", "Username is required").isLength({ min: 1 }).run(req);
-  //   await check("role", "Role is required").isLength({ min: 1 }).run(req);
-  //   await check("role").isIn(["admin", "user"]).run(req);
-
-  console.log("Validation errors:", validationResult(req));
-  const inputErrors = validationResult(req);
-  if (!inputErrors.isEmpty()) {
-    throw new Error(
-      `Validation failed: ${JSON.stringify(inputErrors.array())}`
-    );
-  }
-};
-
-// Create a new user
-
-export async function POST(req: NextRequest) {
-
-  // Call the middleware
-  const middlewareResponse = await authMiddleware(req);
-  // If middleware returns a response (error), return it immediately
-  if (middlewareResponse instanceof NextResponse) {
-    return middlewareResponse; // Unauthorized or token missing
-  }
-  // Destructure the validated token and user
-  const { token } = middlewareResponse;
-  // Verify the token
-  await verifyToken(token);
-
-
+export const POST = withAuth(async(req, { authenticatedUser, supabase }) => {
   try {
     // Log the entire request body received
-    console.log("Request Body:", req.body);
     const body = await req.json();
     console.log("Request Body:", body);
 
@@ -82,7 +39,7 @@ export async function POST(req: NextRequest) {
         .from('users')
         .select('userId')
         .eq('userId', userId)
-        //.single();
+    //.single();
 
     if (checkError) {
       console.error("Error checking user existence:", checkError);
@@ -125,8 +82,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "User updated successfully", data });
   }
-    catch (error) {
-        console.error("Error updating user:", error);
-        return NextResponse.json({ message: "Error updating user", error });
-    }
-}
+  catch (error) {
+    console.error("Error updating user:", error);
+    return NextResponse.json({ message: "Error updating user", error });
+  }
+})

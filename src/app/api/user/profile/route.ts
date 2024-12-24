@@ -1,9 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse, NextRequest } from "next/server";
-import authMiddleware from "../../middleware/authMiddleware";
+import withAuth from "../../middleware/withAuth";
 
 interface User {
-    id: string;
+    userId: string;
     username: string;
     is_admin: boolean;
     gender: string;
@@ -14,32 +13,8 @@ interface User {
     filter_mature: boolean;
 }
 
-export async function GET(req: NextRequest) {
-    // Call the middleware
-    const middlewareResponse = await authMiddleware(req);
 
-    // If middleware returns a response (error), return it immediately
-    if (middlewareResponse instanceof NextResponse) {
-        return middlewareResponse; // Unauthorized or token missing
-    }
-
-    // Destructure the validated token and user
-    const { token } = middlewareResponse;
-
-    // Create a Supabase client using the validated token
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            },
-        }
-    );
-
-
+export const GET = withAuth(async(req, { authenticatedUser, supabase }) => {
     try {
         // Get user id from the query params
         const userId = req.nextUrl.searchParams.get('id');
@@ -53,12 +28,15 @@ export async function GET(req: NextRequest) {
             .from('users')
             .select('*')
             .eq('userId', userId)
-            .single();
+            .single()
+        console.log(data)
         if (error) {
             console.error('Error getting profile:', error);
             return NextResponse.json({ error: "Invalid input" }, { status: 400 });
         }
         const user: User = data;
+
+        console.log(user.public)
 
         // Check if the user exists and if the profile is public
         if (!user) {
@@ -72,15 +50,4 @@ export async function GET(req: NextRequest) {
         console.log(error);
         return NextResponse.json({ error: "Some error" }, { status: 500 });
     }
-}
-
-export async function PUT(req: NextRequest) {
-    // Middleware to verify the session token
-    const middlewareResponse = await authMiddleware(req);
-    if (middlewareResponse instanceof NextResponse) {
-        return middlewareResponse; // Stop processing if middleware fails
-    }
-    const { token } = middlewareResponse;
-
-    // Additional logic for the PUT request can be added here
-}
+})

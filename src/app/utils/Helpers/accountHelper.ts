@@ -6,9 +6,11 @@ import {User} from "@supabase/auth-helpers-nextjs";
 import {PostgrestError} from "@supabase/supabase-js";
 import UserDataContext from "../../../contexts/userDataContext";
 import {AlertDialog} from "@radix-ui/themes";
+import {useContext} from "react";
 
 // TODO: Create api endpoint to handle account creation
 const supabase = createClient();
+
 
 /**
  * The CreateNewAccount fn creates a new user account in the database. Simply pass it form data It calls the backend API to create a new user and then
@@ -26,6 +28,7 @@ export async function CreateNewAccount (formData: any): Promise<boolean>{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${formData.accessToken}`,
             },
             body: JSON.stringify(formData),
         });

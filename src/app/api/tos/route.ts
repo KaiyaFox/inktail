@@ -1,3 +1,4 @@
+// Todo: Change this to a static file. No need to read it from the file system every time.
 import path from 'path';
 import fs from 'fs';
 import { NextResponse, NextRequest } from "next/server";

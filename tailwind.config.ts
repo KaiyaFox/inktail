@@ -32,6 +32,18 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      spacing: {
+        // Define Radix-style size scale
+        1: "4px",  // Radix size-1
+        2: "8px",  // Radix size-2
+        3: "12px", // Radix size-3
+        4: "16px", // Radix size-4
+        5: "20px", // Radix size-5
+        6: "24px",
+        7: "28px",
+        8: "32px",
+        9: "36px",
+      },
     },
   },
   plugins: [],

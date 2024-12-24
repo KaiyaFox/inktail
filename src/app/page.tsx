@@ -5,6 +5,7 @@ import { NextRouter } from 'next/router';
 import CreateNewCommission from './components/commission/CreateNew';
 import {Box, Button, Container, Text, Heading, Separator, Flex} from "@radix-ui/themes";
 import LargeSearchBar from "./components/Search/LargeSearchBar";
+import SignUpButton from "./components/Buttons/SignUp";
 import CreateSprintDialog from "./components/commission/Create/CommissionSprint";
 import AccountSetup from "./components/Onboarding/AccountSetup";
 import Basic from "./components/Onboarding/Form";
@@ -23,25 +24,25 @@ const HomePage: React.FC = () => {
               display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '50vh',
+                padding: '2rem',
           }}>
-              <Text mb={"2"} size={"9"} style={{textAlign: 'center', padding: '1rem'}}>InkTail</Text>
+              <Text mb={"1"} size={"9"} style={{textAlign: 'center', padding: '2rem'}}>InkTail</Text>
               <Flex gap="3" align={"center"}>
               <Separator size={"3"} orientation="vertical" />
-              <Text size={"3"} as="p">The commission management platform for furry creators and artists.</Text>
-
+                  <Text size={"5"} as="p">The commission management platform for furry creators and artists.</Text>
           </Flex>
 
 
       </Box>
-          <Box style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
+              <SignUpButton />
+          </Box>
+
+          <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2rem'}}>
               <Container>
                   <LargeSearchBar/>
               </Container>
           </Box>
-          <AccountSetup/>
-          <Basic/>
-          <NewCharacterDialog/>
 
 
       </>

@@ -1,11 +1,9 @@
-
-
-import react from "react";
-import {Box, Text, Badge, Blockquote, Tabs} from "@radix-ui/themes";
-import CreateSprintDialog from "../commission/Create/CommissionSprint";
 import React from "react";
-import CreateNew from "../commission/CreateNew";
-import {NewCharacterDialog} from "../Character/CreateCharacterDialog";
+import { Box, Text, Badge, Blockquote, Heading } from "@radix-ui/themes";
+import CreateSprintDialog from "../commission/Create/CommissionSprint";
+import { NewCharacterDialog } from "../Character/CreateCharacterDialog";
+import { FaEdit } from "react-icons/fa";
+import Dashboard from "./Dashboard";
 
 interface UserProfile {
     is_admin: boolean;
@@ -15,73 +13,75 @@ interface UserProfile {
     pronouns: string;
     gender: string;
     creator: boolean;
+    bannerUrl?: string;
 }
 
-
-/**
- * This component is the view for the users profile if the user is viewing their own profile.
- * It displays the users information and allows them to edit it.
- */
-const ManageProfile: React.FC <UserProfile> = ({is_admin, bio, username, email, pronouns, gender, creator}) => {
+const ManageProfile: React.FC<UserProfile> = (
+    {
+        is_admin,
+        bio,
+        username,
+        email,
+        pronouns,
+        gender,
+        creator,
+        bannerUrl
+    }) => {
     return (
-
-        <Box
-            py="9"
-            style={{
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                borderRadius: 'var(--radius-3)',
-                position: 'relative',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '200px',
-            }}
-        >
+        <Box className="relative">
+            {/* Banner Image Section */}
             <Box
+                py="9"
+                className="relative flex justify-center items-center h-[300px] bg-cover bg-center"
                 style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: -100,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '20px',
-                    animation: 'fadeIn 3.0s',
+                    backgroundImage: `url(${bannerUrl || "public/inktail_logo_1920x500_fixed.png"})`,
                 }}
             >
-                <>
-                    <Text style={{ color: 'white', fontSize: '48px' }}>{username}</Text>
-                    <Blockquote>
-                        {bio}
-                    </Blockquote>
-                    <Text style={{ color: 'white', fontSize: '18px' }}>{email}</Text>
-                    <Text style={{ color: 'white', fontSize: '16px' }}>Pronouns: {pronouns}</Text>
-                    <Text style={{ color: 'white', fontSize: '16px' }}>Gender: {gender}</Text>
-                    <Text style={{ color: 'white', fontSize: '16px' }}>Creator: {creator}</Text>
-                    <Badge color={'gray'}>Admin{is_admin}</Badge>
+                {/* Gradient overlay */}
+                <Box
+                    className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent"
+                    style={{ left: 0, width: "100%" }}
+                ></Box>
 
-                    <Badge>{creator}</Badge>
-                    {/* Add more fields as needed */}
+                {/* Profile Information and Social Links */}
+                <Box
+                    className="absolute inset-0 flex justify-between items-start p-5 animate-fadeIn"
+                    style={{ bottom: "-100px" }}
+                >
+                    {/* Left Section: Profile Info */}
+                    <Box className="flex flex-col">
+                        <Text className="text-white text-6xl font-mono">{username}</Text>
 
-                    <CreateSprintDialog />
-                    <NewCharacterDialog />
+                        <Box>
+                            <Badge className="mt-0">{creator ? "Creator" : "User"}</Badge>
+                        </Box>
 
+                        <Box>
+                            <Blockquote className="text-white w-[35%]">{bio}</Blockquote>
+                        </Box>
 
-                </>
+                        <Box>
+                            <Text className="text-white text-sm">Pronouns: {pronouns}</Text>
+                            <Text className="text-white text-sm">Gender: {gender}</Text>
+                            <Badge className="text-white bg-gray-500">
+                                {is_admin ? "Admin" : ""}
+                            </Badge>
+                        </Box>
+                        <Box className="mt-4">
+                            <CreateSprintDialog />
+                            <NewCharacterDialog />
+                        </Box>
+                    </Box>
+                </Box>
             </Box>
 
+            {/* Dashboard Section Below Profile */}
+            <Box className="mt-5 px-40">
+                <Dashboard />
+            </Box>
         </Box>
-
-
-
-
-
     );
-}
+};
+
 
 export default ManageProfile;

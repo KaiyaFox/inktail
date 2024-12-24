@@ -501,6 +501,8 @@ const TermsAndConditions = ({onNext, onback, formik}) => {
 const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferences, tosAgree, formikValues}) => {
 
     const { session, userId } = useContext(UserDataContext);
+    const accessToken = session?.access_token;
+    const authenticated = session?.aud;
 
 
     // Convert to formData and send to the server
@@ -509,6 +511,8 @@ const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferenc
         const formData = {
             ...formikValues,
             userId,
+            accessToken,
+            authenticated,
         };
         // Send the formData object to the server
         try {

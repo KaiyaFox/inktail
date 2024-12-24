@@ -1,9 +1,10 @@
 'use client'
-import {Flex, Text, Button, Box, Heading, Avatar, Link} from '@radix-ui/themes';
+import {Flex, Text, Button, Box, Heading, Avatar, Link, Container} from '@radix-ui/themes';
 import React from "react";
 import SmallSearchBar from "./Search/SmallSearchBar";
 import { useRouter } from 'next/navigation';
 import LoginWithDiscordButton from "./LoginWithDiscordButton";
+import Image from 'next/image';
 
 export default function Navbar() {
     const router = useRouter();
@@ -27,12 +28,18 @@ export default function Navbar() {
                 justifyContent: "space-between", // Add this
                 alignItems: "center",
             }}>
-                <Box>
-                    <Link size={"7"} onClick={goHome}
-                        style={{fontSize: '28px', cursor: 'var(--cursor-link)'}}>InkTail
-                    </Link>
-                    <p>Commission based art platform</p>
-
+                <Box style={{ maxWidth: "100px", maxHeight: "100px", overflow: "hidden" }}>
+                    <Link size={"7"} onClick={goHome}></Link>
+                    <Container size={"3"}>
+                        <Link href="/">
+                            <Image
+                                src="/inktail.webp"
+                                alt="InkTail logo"
+                                width={100}
+                                height={100}
+                            />
+                        </Link>
+                    </Container>
                 </Box>
 
                 <Box>

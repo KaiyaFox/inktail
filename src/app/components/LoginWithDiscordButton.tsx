@@ -6,6 +6,7 @@ import { createClient } from "../utils/supabase/client";
 import {createUser, testConnection} from "../utils/Helpers/accountHelper";
 import { useRouter } from 'next/navigation';
 import UserDataContext from "../../contexts/userDataContext";
+import LogoutButton from "./Buttons/Logout";
 import Image from 'next/image';
 import { middleware } from '../../middleware';
 import {Button, Avatar, Flex, Skeleton, Box, HoverCard, Link, Heading, Text, Badge, Spinner, Switch} from "@radix-ui/themes";
@@ -40,7 +41,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
     const [loading, setLoading] = React.useState<boolean>(false);
     const router = useRouter();
 
-    // Handle Navigation
+    // Handle Navigation to different pages
     const handleNavigation = (path: string) => {
         router.push(path)
     }
@@ -202,7 +203,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                                     onClick={() => handleNavigation(`/user/${userId}`)}
                                       style={{ cursor: 'pointer'}}>
                                     <Avatar
-                                        radius="large"
+                                        radius="full"
                                         size="5"
                                         src={user.user_metadata.avatar_url}
                                         fallback={user.user_metadata.custom_claims.global_name.charAt(0)}
@@ -240,9 +241,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
                                                         <Button mb={'3'} size={"2"} color={"purple"} onClick={() => handleNavigation('/settings')}>Settings</Button>
 
                                                     </Box>
-                                                    <Button size={"2"} color={"red"} onClick={handleLogout}>
-                                                        Logout <ExitIcon />
-                                                    </Button>
+                                                    <LogoutButton />
                                                 </Box>
 
                                                     <Text size={"2"}>Filter NSFW <Switch size={"3"} radius={"full"}  />

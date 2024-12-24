@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import authMiddleware from "../../middleware/authMiddleware";
-import { createClient } from "@supabase/supabase-js";
+import withAuth from "../../middleware/withAuth";
 
 interface Tag {
     id: number;
@@ -15,31 +14,9 @@ interface Tag {
  * @param res
  * @constructor
  */
-export async function POST(req: NextRequest, res: NextResponse) {
-    // Call the middleware
-    const middlewareResponse = await authMiddleware(req);
 
-    // If middleware returns a response (error), return it immediately
-    if (middlewareResponse instanceof NextResponse) {
-        return middlewareResponse; // Unauthorized or token missing
-    }
 
-    // Destructure the validated token and user
-    const { token } = middlewareResponse;
-
-    // Create a Supabase client using the validated token
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            },
-        }
-    );
-
+export const POST = withAuth(async (req, { authenticatedUser, supabase }) => {
     try {
         // Read the request body and parse the tag name
         const requestBody = await req.text();
@@ -70,4 +47,4 @@ export async function POST(req: NextRequest, res: NextResponse) {
         console.error(e);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
-}
+});

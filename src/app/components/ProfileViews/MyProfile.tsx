@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Box, Text, Badge, Blockquote, Heading } from "@radix-ui/themes";
 import CreateSprintDialog from "../commission/Create/CommissionSprint";
 import { NewCharacterDialog } from "../Character/CreateCharacterDialog";
@@ -28,6 +28,8 @@ const ManageProfile: React.FC<UserProfile> = (
         creator,
         bannerUrl
     }) => {
+    const [bannerURL, setBannerURL] = useState<string | null>(null);
+
     return (
         <Box className="relative">
             {/* Banner Image Section */}
@@ -69,6 +71,8 @@ const ManageProfile: React.FC<UserProfile> = (
 
                         <Box>
                             <Text className="text-white text-sm">Pronouns: {pronouns}</Text>
+                        </Box>
+                        <Box>
                             <Text className="text-white text-sm">Gender: {gender}</Text>
                             <Badge className="text-white bg-gray-500">
                                 {is_admin ? "Admin" : ""}

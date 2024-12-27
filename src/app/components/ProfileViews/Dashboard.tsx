@@ -3,6 +3,7 @@ import { Box, Card, Heading, Text, Badge, Button } from '@radix-ui/themes';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 import {NewCharacterDialog} from "../Character/CreateCharacterDialog";
+import { useRouter } from "next/navigation";
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -20,23 +21,38 @@ const data = {
 };
 
 const Dashboard: React.FC = () => {
+    const router = useRouter();
+
+    const handleCardClick = (path: string) => {
+        router.push(path)
+    };
+
     return (
         <Box className="space-y-6 p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {/* Card 1: Total Posts */}
-                <Card className="bg-purple-900 p-4 shadow-md rounded-lg">
+                <Card className="bg-purple-900 p-4 shadow-md rounded-lg cursor-pointer">
                     <Heading size="3" className="text-xl">Uploaded content</Heading>
                     <Text className="text-2xl">120</Text>
                 </Card>
 
+
+                {/* Card 3: Earnings */}
+                <Card className="bg-purple-900 p-4 shadow-md rounded-lg cursor-pointer" onClick={() => handleCardClick('/my-characters')}>
+                    <Heading size="3" className="text-xl">Original Characters</Heading>
+                    <Text className="text-2xl">4</Text>
+                </Card>
+
+
+
                 {/* Card 2: Total Followers */}
-                <Card className="bg-purple-900 p-4 shadow-md rounded-lg">
+                <Card className="bg-purple-900 p-4 shadow-md rounded-lg cursor-pointer">
                     <Heading size="3" className="text-xl">Followers</Heading>
                     <Text className="text-2xl">1,250</Text>
                 </Card>
 
                 {/* Card 3: Earnings */}
-                <Card className="bg-purple-900 p-4 shadow-md rounded-lg">
+                <Card className="bg-purple-900 p-4 shadow-md rounded-lg cursor-pointer">
                     <Heading size="3" className="text-xl">Commission Payouts (Last 30 days)</Heading>
                     <Text className="text-2xl">$500</Text>
                 </Card>

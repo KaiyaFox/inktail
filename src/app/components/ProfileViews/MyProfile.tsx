@@ -79,15 +79,14 @@ const ManageProfile: React.FC<UserProfile> = (
                             </Badge>
                         </Box>
                         <Box className="mt-4">
-                            <CreateSprintDialog />
-                            <NewCharacterDialog />
+
                         </Box>
                     </Box>
                 </Box>
             </Box>
 
             {/* Dashboard Section Below Profile */}
-            <Box className="mt-5 px-40">
+            <Box className="mt-1 px-10">
                 <Dashboard />
             </Box>
         </Box>

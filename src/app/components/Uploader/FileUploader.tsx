@@ -8,14 +8,25 @@ import Tus from '@uppy/tus';
 import { createClient } from '../../utils/supabase/client';
 import { headers } from 'next/headers';
 
-const SUPABASE_PROJECT_ID = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID;
 const supabase = createClient();
 
-const FileUploader: React.FC = () => {
+interface FileUploaderProps {
+    bucketName: string;
+    storageURL?: string;
+}
+
+/**
+ * FileUploader component. This component uses Uppy to upload files to Supabase Storage. Provide the bucket name and optional
+ * storage URL to use this component.
+ * @param bucketName
+ * @param storageURL
+ * @example <FileUploader bucketName="public" />
+ */
+const FileUploader: React.FC<FileUploaderProps> = ({ bucketName, storageURL }) => {
     const uppy = useRef<Uppy | null>(null);
 
-    const bucket = 'commission_refs';
-    const supabaseStorageURL = 'https://evhegzzxnckoxwwtkjhz.supabase.co/storage/v1/upload/resumable';
+    const bucket = bucketName;
+    const supabaseStorageURL = 'https://echujftzgqswjjolmxez.supabase.co/storage/v1/upload/resumable';
 
 
     useEffect(() => {
@@ -47,10 +58,6 @@ const FileUploader: React.FC = () => {
                     "contentType",
                     "cacheControl",
                 ],
-
-
-
-
             });
             // Add metadata to each file
             uppy.current.on('file-added', (file) => {

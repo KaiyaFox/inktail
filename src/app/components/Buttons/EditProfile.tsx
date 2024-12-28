@@ -4,7 +4,6 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {Dialog} from "@radix-ui/themes";
 import { FaEllipsisV } from "react-icons/fa";
 import { FaEllipsis } from "react-icons/fa6";
-import TriggerIcon from "@radix-ui/themes/dist/cjs/components/dropdown-menu";
 import { Share1Icon} from "@radix-ui/react-icons";
 import LogoutButton from "./Logout";
 

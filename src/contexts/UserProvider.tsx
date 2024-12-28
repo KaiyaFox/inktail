@@ -14,6 +14,7 @@ const UserProvider = ({ children }) => {
     const [admin, setAdmin] = react.useState(false);
     const [provider, setProvider] = react.useState('');
     const [mature, setMature] = react.useState<boolean>(false);
+    const [accessToken, setAccessToken] = react.useState('');
     const [userProfile, setUserProfile] = react.useState({
         userSession: '',
         userId: '',
@@ -31,6 +32,7 @@ const UserProvider = ({ children }) => {
         bio: '',
         twitch: '',
         twitter: '',
+        accessToken: '',
     });
 
     useEffect(() => {
@@ -46,8 +48,9 @@ const UserProvider = ({ children }) => {
             mature,
             userProfile,
             username,
+            accessToken,
         });
-    }, [user, session, isOnboarded, userId, avatarUrl, email, admin, provider, mature, userProfile, username]);
+    }, [user, session, isOnboarded, userId, avatarUrl, email, admin, provider, mature, userProfile, username, accessToken]);
 
     return (
         <UserDataContext.Provider
@@ -63,6 +66,7 @@ const UserProvider = ({ children }) => {
                 mature, setMature,
                 userProfile, setUserProfile,
                 username, setUsername,
+                accessToken, setAccessToken,
             }}
         >
             {children}

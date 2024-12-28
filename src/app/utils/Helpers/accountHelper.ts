@@ -11,7 +11,6 @@ import {useContext} from "react";
 // TODO: Create api endpoint to handle account creation
 const supabase = createClient();
 
-
 /**
  * The CreateNewAccount fn creates a new user account in the database. Simply pass it form data It calls the backend API to create a new user and then
  * returns a boolean.

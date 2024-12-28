@@ -21,14 +21,26 @@ import {
     Code, Select,
     Callout,
 
-} from "@radix-ui/themes";
+}
+
+
+from "@radix-ui/themes";
 import {CopyIcon, InfoCircledIcon} from "@radix-ui/react-icons";
-import React from "react";
+import React, {useContext} from "react";
 import FileUploader from "../Uploader/FileUploader";
 import ToolTip from "../ToolTip";
 import { ChromePicker } from 'react-color';
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import { CreateNewCharacter}  from "../../utils/Helpers/characterHelper";
+import formatters from "chart.js/dist/core/core.ticks";
+import UserDataContext from "../../../contexts/userDataContext";
+
+// Tab components
+import PhysicalAppearance from "./Tabs/PhysicalAppearance";
+import ReferenceSheet from "./Tabs/ReferenceSheet";
+import CharacterSettings from "./Tabs/CharacterSettings";
+
 
 // Input validation schema
 const validationSchema = Yup.object({
@@ -42,25 +54,64 @@ const validationSchema = Yup.object({
         .max(1000, 'Description cannot be more than 1000 characters'),
 });
 
+
+// Convert to formData and send to the server
+const createCharacter = async (formData: any, accessToken: string, userid: string) => {
+    // Send the formData object to the server
+    try {
+        // Pass the formData object to the CreateNewAccount helper function
+        console.log(formData)
+        console.log(typeof formData)
+        await CreateNewCharacter({ ...formData, accessToken, userid });
+    } catch (error) {
+        console.error('Failed to create character:', error);
+    }
+};
+
 export const NewCharacterDialog = () => {
-    const initialValues = {
+    const {session} = useContext(UserDataContext);
+    const userid = session?.user.id;
+    const accessToken = session?.access_token;
+
+    // COnsilidate state
+    const [characterData, setCharacterData] = React.useState({
         charName: '',
         charDesc: '',
         charSpecies: '',
         gender: '',
         pronouns: '',
         height: '',
+        weight: '',
         build: '',
         furScales: '',
         eyes: '',
+        eyeType: '',
+        eyeColor: '',
+        hairColor: '',
+        skinColor: '',
+        hairStyle: '',
+        hairLength: '',
+        hairTexture: '',
+        facialHair: '',
+        bodyMarkings: '',
         ears: '',
+        innerEar: '',
         tail: '',
         markings: '',
         clothingAccessories: '',
         distinctiveFeatures: '',
         primaryColor: '#ffffff',
         secondaryColor: '#ffffff',
-    };
+
+    });
+
+    // Update specific fields in the characterData object
+    const handleFieldChange = (field: string, value: string) => {
+        setCharacterData((prevState) => ({
+            ...prevState,
+            [field]: value,
+        }));
+    }
 
     return (
         <Dialog.Root>
@@ -74,11 +125,12 @@ export const NewCharacterDialog = () => {
                 </Dialog.Description>
                 <Container>
                     <Formik
-                        initialValues={initialValues}
+                        initialValues={characterData}
                         validationSchema={validationSchema}
                         onSubmit={(values) => {
                             console.log(values);
                             localStorage.setItem('newCharacter', JSON.stringify(values));
+                            createCharacter(values, accessToken, userid);
                         }}
                     >
                         {({ values, errors, touched, handleChange, handleBlur, setFieldValue }) => (
@@ -87,10 +139,44 @@ export const NewCharacterDialog = () => {
                                     <Tabs.List>
                                         <Tabs.Trigger value="CharProfile">Basic Profile</Tabs.Trigger>
                                         <Tabs.Trigger value="PhysicalAppearance">Physical Appearance</Tabs.Trigger>
-                                        <Tabs.Trigger value="documents">Reference Sheet</Tabs.Trigger>
+                                        <Tabs.Trigger value="Ref">Reference Sheet</Tabs.Trigger>
                                         <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
                                     </Tabs.List>
                                     <Box pt="3">
+
+
+                                        <Tabs.Content value="PhysicalAppearance">
+                                            <PhysicalAppearance
+                                            data={{
+                                                height: values.height,
+                                                weight: values.weight,
+                                                hairColor: values.hairColor,
+                                                eyeColor: values.eyeColor,
+                                                skinColor: values.skinColor,
+                                                facialHair: values.facialHair,
+                                                bodyMarkings: values.bodyMarkings,
+                                                hairStyle: values.hairStyle,
+                                                hairLength: values.hairLength,
+                                                hairTexture: values.hairTexture,
+                                                ears: values.ears,
+                                                innerEar: values.innerEar,
+                                                eyeType: values.eyeType,
+                                            }}
+                                            onchange={handleFieldChange}
+                                            />
+                                        </Tabs.Content>
+
+
+                                        <Tabs.Content value="Ref">
+                                            <ReferenceSheet/>
+                                        </Tabs.Content>
+
+
+                                        <Tabs.Content value="settings">
+                                            <CharacterSettings/>
+                                        </Tabs.Content>
+
+
                                         <Tabs.Content value="CharProfile">
                                             <Callout.Root>
                                                 <Callout.Icon>
@@ -215,7 +301,7 @@ export const NewCharacterDialog = () => {
                                             Cancel
                                         </Button>
                                     </Dialog.Close>
-                                    <Button type="submit">Create</Button>
+                                    <Button type="submit" onClick={createCharacter}>Create</Button>
                                 </Flex>
                             </Form>
                         )}

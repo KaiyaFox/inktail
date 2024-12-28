@@ -29,7 +29,7 @@ export default function Footer () {
 
 
             </Box>
-            <Text style={{fontSize: "10px"}}> &copy; 2024 InkTail</Text>
+            <Text style={{fontSize: "10px"}}> &copy; 2025 InkTail</Text>
 
 
         </footer>

@@ -83,7 +83,7 @@ const CreateNewCommission = () => {
             <div>
                 <label htmlFor="reference_media">Ref Sheet:</label>
                 <input type="file" id="reference_media" />
-                <FileUploader />
+                <FileUploader bucketName={""} />
 
 
             </div>

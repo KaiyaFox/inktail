@@ -33,7 +33,7 @@ import { ChromePicker } from 'react-color';
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { CreateNewCharacter}  from "../../utils/Helpers/characterHelper";
-import formatters from "chart.js/dist/core/core.ticks";
+// import formatters from "chart.js/dist/core/core.ticks";
 import UserDataContext from "../../../contexts/userDataContext";
 
 // Tab components
@@ -301,7 +301,7 @@ export const NewCharacterDialog = () => {
                                             Cancel
                                         </Button>
                                     </Dialog.Close>
-                                    <Button type="submit" onClick={createCharacter}>Create</Button>
+                                    <Button type="submit">Create</Button>
                                 </Flex>
                             </Form>
                         )}

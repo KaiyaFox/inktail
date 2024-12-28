@@ -59,7 +59,7 @@ const Dashboard: React.FC = () => {
                 {/* Card 3: Earnings */}
                 <Card className="bg-purple-900 p-4 shadow-md rounded-lg cursor-pointer">
                     <Heading size="3" className="text-xl">Commission Payouts (Last 30 days)</Heading>
-                    <Text className="text-2xl">$500</Text>
+                    <Text className="text-2xl">$7,800</Text>
                 </Card>
             </div>
 

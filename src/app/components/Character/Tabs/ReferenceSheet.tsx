@@ -10,7 +10,7 @@ const ReferenceSheet: React.FC = () => {
         <div>
             <h1>Reference Sheet</h1>
             <p>Reference Sheet</p>
-            <FileUploader bucketName="characters" />
+            <FileUploader bucketName="characters" fileLimit={3} />
 
         </div>
     );

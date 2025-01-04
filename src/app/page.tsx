@@ -29,20 +29,22 @@ const HomePage: React.FC = () => {
               <Text mb={"1"} size={"9"} style={{textAlign: 'center', padding: '2rem'}}>InkTail</Text>
               <Flex gap="3" align={"center"}>
               <Separator size={"3"} orientation="vertical" />
-                  <Text size={"5"} as="p">The commission management platform for furry creators and artists.</Text>
+                  <Text size={"5"} as="p">The commission-first art platform for furry creators and artists.</Text>
           </Flex>
 
 
-      </Box>
-          <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
-              <SignUpButton />
-          </Box>
 
+
+      </Box>
           <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2rem'}}>
               <Container>
                   <LargeSearchBar/>
               </Container>
           </Box>
+          <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
+              <SignUpButton />
+          </Box>
+
 
 
       </>

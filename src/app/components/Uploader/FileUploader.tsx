@@ -12,17 +12,20 @@ const supabase = createClient();
 
 interface FileUploaderProps {
     bucketName: string;
+    folderPath?: string;
     fileSizeLimit?: number;
     storageURL?: string;
     allowedFileTypes?: string[];
     sizeLimit?: number;
     fileLimit?: number;
+    uppyInstance?: Uppy;
 }
 
 /**
  * FileUploader component. This component uses Uppy to upload files to Supabase Storage. Provide the bucket name and optional
  * storage URL to use this component.
- * @param bucketName The name of the bucket to upload files to
+ * @param bucketName The name of the bucket to upload files to. Pass in a users UUID to access the user's bucket.
+ * @param folderPath The path to the folder to upload files to. Default is the root of the bucket specified in bucketName.
  * @param storageURL The URL of the Supabase Storage endpoint. Should not be changed unless you know what you're doing.
  * @param fileSizeLimit The maximum number of files that can be uploaded. Default is 1.
  * @param allowedFileTypes An array of allowed file types to upload
@@ -37,20 +40,27 @@ const FileUploader: React.FC<FileUploaderProps> = (
         fileSizeLimit = 1024 * 1024 * 25,
         fileLimit = 1,
         allowedFileTypes = ['image/*'],
+        uppyInstance,
 }) => {
-    const uppy = useRef<Uppy | null>(null);
+    const uppy = useRef<Uppy | null>(uppyInstance || null);
 
 
     const bucket = bucketName;
     const supabaseStorageURL = 'https://echujftzgqswjjolmxez.supabase.co/storage/v1/upload/resumable';
     const sizeLimit = fileSizeLimit;
 
-
+// TODO: Fix uppy instance from reloading on every render and losing the upload state.
     useEffect(() => {
-        const session = supabase.auth.getSession();
+        const initializeUppy = async () => {
+            if (uppy.current) return; // Prevent reinitialization
+            const session = await supabase.auth.getSession();
+            const accessToken = session?.data?.session?.access_token;
+        }
+
         supabase.auth.getSession().then(session => {
             console.log('Session:', session);
             const accessToken = session?.data?.session?.access_token;
+
             console.log('Access Token:', accessToken);
 
 
@@ -112,16 +122,18 @@ const FileUploader: React.FC<FileUploaderProps> = (
         });
         console.log(bucket);
 
+        initializeUppy()
 
         return () => {
-            if (uppy.current) {
+            if (!uppyInstance && uppy.current) {
                 // Clean up Uppy
                 uppy.current.destroy();
+
 
             }
         };
 
-    }, [bucket,sizeLimit,allowedFileTypes,supabaseStorageURL]);
+    }, [bucket,sizeLimit,allowedFileTypes,supabaseStorageURL, uppyInstance]);
 
 
     return (

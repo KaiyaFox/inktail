@@ -5,6 +5,7 @@ import SmallSearchBar from "./Search/SmallSearchBar";
 import { useRouter } from 'next/navigation';
 import LoginWithDiscordButton from "./LoginWithDiscordButton";
 import Image from 'next/image';
+import LoginButton from "./LoginButton";
 
 export default function Navbar() {
     const router = useRouter();
@@ -45,7 +46,7 @@ export default function Navbar() {
                 <Box>
                     <Flex gap="3">
                         <Box width="64px" height="64px">
-                            <LoginWithDiscordButton />
+                            <LoginButton />
                         </Box>
                     </Flex>
                 </Box>

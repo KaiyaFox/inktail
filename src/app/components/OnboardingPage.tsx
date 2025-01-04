@@ -29,7 +29,7 @@ import {
 import { ArrowRightIcon, ArrowLeftIcon} from "@radix-ui/react-icons";
 import * as Yup from "yup";
 import { useFormik, FieldArray, FieldArrayRenderProps} from "formik";
-import {CreateNewAccount} from "../../app/utils/Helpers/accountHelper";
+import {CreateNewAccount, createBucket, createStoragePath} from "../../app/utils/Helpers/accountHelper";
 
 // Debounce the form validation to prevent spamming the server
 function useDebounce(value: string, delay: number): string {
@@ -518,7 +518,9 @@ const FinalizeAccount = ({onNext, username, gender, creator, commissionPreferenc
         try {
             // Pass the formData object to the CreateNewAccount helper function
             console.log(formData)
+            // Create a new user account
             await CreateNewAccount(formData);
+
             onNext();
         } catch (error) {
             console.error('Failed to create user:', error);

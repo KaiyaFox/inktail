@@ -97,9 +97,7 @@ const LoginWithDiscordButton: React.FC<LoginWithDiscordButtonProps> = (props) =>
             console.error('Some error occurred:', error)
         }
     }
-    /**
-     *
-     * */
+
     // Hook checks if user exists and has completed onboarding
     useEffect(() => {
         // Check if user has set up account and completed onboarding

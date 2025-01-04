@@ -1,5 +1,7 @@
 /**
- * This route creates a new user in the database.
+ * This route creates a new user in the database, and creates a path in the users bucket for the user's content. Note
+ * that this route also creates storage paths for the user in the users storage bucket.
+ * @param req The incoming request
  *
  */
 
@@ -77,6 +79,26 @@ export const POST = withAuth(async(req, { authenticatedUser, supabase }) => {
     if (error) {
       console.error("Error updating user:", error);
       return NextResponse.json({ message: "Error updating user", error });
+    }
+
+    // Create storage paths array
+    const storagePaths = [
+        `${userId}/characters/`,
+        `${userId}/commissions/`,
+        `${userId}/uploads/`,
+        `${userId}/profile/`,
+    ]
+
+    for (const path of storagePaths) {
+      const { error: pathError } = await supabase.storage
+          .from('users')
+          .upload(`${storagePaths}`, 'This is a placeholder file to create the path', {
+            upsert: true,
+          });
+      if (pathError) {
+        console.error("Error creating storage path:", pathError);
+        return NextResponse.json({ message: "Error creating storage paths", pathError });
+      }
     }
 
 

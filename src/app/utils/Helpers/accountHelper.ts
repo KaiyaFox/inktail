@@ -173,3 +173,49 @@ export const testConnection = async () => {
         return false;
     }
 }
+
+/**
+ * Creates a new storage bucket with the users ID as the bucket name while also creating subdirectories for the user's content.
+ * @param {string} userId - The user's unique ID from the session data.
+ * @returns {boolean} - Returns true if the bucket was created successfully, otherwise false.
+ * @example createBucket('12345') // returns true or false
+ */
+
+export const createBucket = async (userId: string): Promise<boolean> => {
+    try {
+        console.log("Creating bucket for user:", userId);
+        const {data, error} = await supabase.storage.createBucket(userId);
+        if (error) {
+            console.error('Error creating bucket:', error);
+            return false;
+        } else {
+            console.log('Bucket created successfully:', data);
+            return true;
+        }
+    } catch (error) {
+        console.error('Error creating bucket:', error);
+        return false;
+    }
+
+}
+/**
+ * Creates a new path in the existing users bucket with the user's ID as the directory name.
+ * @param userId - The user's unique ID from the session data.
+ */
+export const createStoragePath = async (userId: string): Promise<boolean> => {
+    const bucket = "users";
+    const fileName = "init";
+    const path = `${userId}/${fileName}`;
+    const { data, error } = await supabase.storage.from(bucket).upload(path, fileName, {
+        upsert: true,
+    });
+    if (error) {
+        console.error('Error creating storage path:', error);
+        return false;
+    } else {
+        console.log('Storage path created successfully:', data);
+        return true;
+    }
+
+
+}
